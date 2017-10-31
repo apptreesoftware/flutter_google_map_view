@@ -13,13 +13,16 @@
 
 @interface MapViewController : UIViewController <GMSMapViewDelegate>
 
-- (id)initWithPlugin:(MapViewPlugin *)plugin;
+- (id)initWithPlugin:(MapViewPlugin *)plugin navigationItems:(NSArray *)items;
 
 - (void)shutdown;
 
 - (void)setCamera:(CLLocationCoordinate2D)location zoom:(float)zoom;
 - (void)updateAnnotations:(NSArray *)annotations;
 - (void)zoomToAnnotations;
+
+- (NSArray *)visibleMarkers;
+
 - (void)setLocationEnabled:(BOOL) enabled;
 
 @property (readonly) float zoomLevel;

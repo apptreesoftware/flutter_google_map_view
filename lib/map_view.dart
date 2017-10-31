@@ -12,6 +12,8 @@ class MapView {
       new StreamController.broadcast();
   StreamController<CameraPosition> _cameraStreamController =
       new StreamController.broadcast();
+  StreamController<int> _toolbarActionStreamController =
+      new StreamController.broadcast();
 
   List<MapAnnotation> _annotations;
 
@@ -19,8 +21,13 @@ class MapView {
     _channel.setMethodCallHandler(_handleMethod);
   }
 
-  void show(MapOptions mapOptions) {
-    _channel.invokeMethod('show', mapOptions.toMap());
+  void show(MapOptions mapOptions, {List<ToolbarAction> toolbarActions}) {
+    List<Map> actions = [];
+    if (toolbarActions != null) {
+      actions = toolbarActions.map((t) => t.toMap).toList();
+    }
+    _channel.invokeMethod(
+        'show', {"mapOptions": mapOptions.toMap(), "actions": actions});
   }
 
   void dismiss() {
@@ -47,7 +54,7 @@ class MapView {
     return new Location(locationMap["latitude"], locationMap["longitude"]);
   }
 
-  Future<Location> get zoomLevel async {
+  Future<double> get zoomLevel async {
     return await _channel.invokeMethod("getZoomLevel");
   }
 
@@ -60,6 +67,8 @@ class MapView {
   Stream<Location> get onMapTapped => _mapInteractionStreamController.stream;
 
   Stream<CameraPosition> get onCameraChanged => _cameraStreamController.stream;
+
+  Stream<int> get onToolbarAction => _toolbarActionStreamController.stream;
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     print("Received method call ${call.method}");
@@ -83,6 +92,9 @@ class MapView {
       case "cameraPositionChanged":
         _cameraStreamController.add(new CameraPosition.fromMap(call.arguments));
         return new Future.value("");
+      case "onToolbarAction":
+        _toolbarActionStreamController.add(call.arguments);
+        break;
     }
     return new Future.value("");
   }
@@ -182,3 +194,17 @@ class CameraPosition {
 }
 
 enum MapType { google }
+
+class ToolbarAction {
+  final String title;
+  final int identifier;
+
+  /// Show the button in the toolbar only if there is room.
+  /// DEFAULTS to false
+  /// Only works on Android
+  bool showIfRoom = false;
+
+  ToolbarAction(this.title, this.identifier);
+
+  Map get toMap => {"title": title, "identifier": identifier};
+}

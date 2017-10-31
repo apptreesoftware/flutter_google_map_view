@@ -17,14 +17,16 @@
 @property (nonatomic) BOOL _locationEnabled;
 @property (nonatomic) BOOL observingLocation;
 @property (nonatomic, assign) MapViewPlugin *plugin;
+@property (nonatomic, retain) NSArray *navigationItems;
 @end
 
 @implementation MapViewController
 
-- (id)initWithPlugin:(MapViewPlugin *)plugin {
+- (id)initWithPlugin:(MapViewPlugin *)plugin navigationItems:(NSArray *)items {
     self = [super init];
     if (self) {
         self.plugin = plugin;
+        self.navigationItems = items;
     }
     return self;
 }
@@ -39,7 +41,7 @@
 }
 
 - (void)viewDidLoad {
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismiss)];
+    self.navigationItem.rightBarButtonItems = self.navigationItems;
 }
 
 - (void)setLocationEnabled:(BOOL)enabled {
@@ -85,10 +87,6 @@
         marker.map = self.mapView;
         [self.markers addObject:marker];
     }
-}
-
-- (void)dismiss {
-    [self.plugin handleDismiss];
 }
 
 - (GMSMarker *)createMarkerForAnnotation:(MapAnnotation *)annotation {
@@ -171,6 +169,18 @@
 
 - (float)zoomLevel {
     return self.mapView.camera.zoom;
+}
+
+- (NSArray *)visibleMarkers {
+    GMSVisibleRegion region = self.mapView.projection.visibleRegion;
+    GMSCoordinateBounds *bounds = [[GMSCoordinateBounds alloc]initWithRegion:region];
+    NSMutableArray *visibleMarkers = [NSMutableArray array];
+    for (GMSMarker *marker in self.markers) {
+        if ([bounds containsCoordinate:marker.position]) {
+            [visibleMarkers addObject:marker.userData];
+        }
+    }
+    return visibleMarkers;
 }
 
 @end

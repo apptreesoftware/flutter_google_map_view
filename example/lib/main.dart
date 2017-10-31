@@ -41,7 +41,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   showMap() {
-    mapView.show(new MapOptions(showUserLocation: true, apiKey: "<your_key>"));
+    mapView.show(new MapOptions(showUserLocation: true, apiKey: "<your_key>"),
+        toolbarActions: [new ToolbarAction("Close", 1)]);
     mapView.updateAnnotations(<MapAnnotation>[
       new MapAnnotation("1234", "Cupertino", 37.33527476, 122.408227),
     ]);
@@ -54,5 +55,18 @@ class _MyAppState extends State<MyApp> {
         .listen((location) => print("Touched location $location"));
     mapView.onCameraChanged.listen((cameraPosition) =>
         this.setState(() => this.cameraPosition = cameraPosition));
+    mapView.onToolbarAction.listen((id) {
+      if (id == 1) {
+        _handleDismiss();
+      }
+    });
+  }
+
+  _handleDismiss() async {
+    double zoomLevel = await mapView.zoomLevel;
+    Location centerLocation = await mapView.centerLocation;
+    print("Zoom Level: $zoomLevel");
+    print("Center: $centerLocation");
+    mapView.dismiss();
   }
 }

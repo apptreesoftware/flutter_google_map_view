@@ -25,11 +25,13 @@
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     if ([@"show" isEqualToString:call.method]) {
         NSDictionary *args = call.arguments;
-        NSString *apiKey = args[@"apiKey"];
+        NSDictionary *mapOptions = args[@"mapOptions"];
+        NSString *apiKey = mapOptions[@"apiKey"];
         if (apiKey) {
             [GMSServices provideAPIKey:apiKey];
         }
-        MapViewController *vc = [[MapViewController alloc] initWithPlugin:self];
+        MapViewController *vc = [[MapViewController alloc] initWithPlugin:self
+                                                          navigationItems:[self buttonItemsFromActions:args[@"actions"]]];
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
         [self.host presentViewController:navController animated:true completion:nil];
         self.mapViewController = vc;
@@ -49,6 +51,8 @@
         result(@{@"latitude": @(location.latitude), @"longitude": @(location.longitude)});
     } else if ([@"getZoomLevel" isEqualToString:call.method]) {
         result(@(self.mapViewController.zoomLevel));
+    } else if ([@"getVisibleMarkers" isEqualToString:call.method]) {
+        result(self.mapViewController.visibleMarkers);
     } else if ([@"dismiss" isEqualToString:call.method]) {
         if (self.mapViewController) {
             [self.host dismissViewControllerAnimated:true completion:nil];
@@ -59,6 +63,22 @@
     } else {
         result(FlutterMethodNotImplemented);
     }
+}
+
+
+- (NSArray *)buttonItemsFromActions:(NSArray *)actions {
+    NSMutableArray *buttons = [NSMutableArray array];
+    if (actions) {
+        for (NSDictionary *action in actions) {
+            UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:[action valueForKey:@"title"]
+                                                                       style:UIBarButtonItemStylePlain
+                                                                      target:self
+                                                                      action:@selector(handleToolbar:)];
+            button.tag = [[action valueForKey:@"identifier"] intValue];
+            [buttons addObject:button];
+        }
+    }
+    return buttons;
 }
 
 - (void)handleSetAnnotations:(NSArray *)annotations {
@@ -72,10 +92,8 @@
     [self.mapViewController updateAnnotations:array];
 }
 
-- (void)handleDismiss {
-    [self.mapViewController shutdown];
-    [self.mapViewController.navigationController dismissViewControllerAnimated:true completion:nil];
-    self.mapViewController = nil;
+- (void)handleToolbar:(UIBarButtonItem *)item {
+    [self.channel invokeMethod:@"onToolbarAction" arguments:@(item.tag)];
 }
 
 - (void)handleSetCamera:(NSDictionary *)cameraUpdate {
@@ -97,9 +115,9 @@
 
 - (void)cameraPositionChanged:(GMSCameraPosition *)position {
     [self.channel invokeMethod:@"cameraPositionChanged" arguments:@{
-            @"latitude" : @(position.target.latitude),
-            @"longitude" : @(position.target.longitude),
-            @"zoom" : @(position.zoom)
+            @"latitude": @(position.target.latitude),
+            @"longitude": @(position.target.longitude),
+            @"zoom": @(position.zoom)
     }];
 }
 
