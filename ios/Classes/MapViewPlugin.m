@@ -101,7 +101,7 @@
 
 - (void)handleSetCamera:(NSDictionary *)cameraUpdate {
     CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([cameraUpdate[@"latitude"] doubleValue], [cameraUpdate[@"longitude"] doubleValue]);
-    [self.mapViewContro ller setCamera:coordinate zoom:[cameraUpdate[@"zoom"] floatValue]];
+    [self.mapViewController setCamera:coordinate zoom:[cameraUpdate[@"zoom"] floatValue]];
 }
 
 - (void)locationDidUpdate:(CLLocation *)location {
