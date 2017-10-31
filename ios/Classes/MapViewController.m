@@ -65,11 +65,6 @@
     self.view = self.mapView;
 
     // Creates a marker in the center of the map.
-    GMSMarker *marker = [[GMSMarker alloc] init];
-    marker.position = CLLocationCoordinate2DMake(-33.86, 151.20);
-    marker.title = @"Sydney";
-    marker.snippet = @"Australia";
-    marker.map = self.mapView;
     self.mapView.delegate = self;
     self.mapView.myLocationEnabled = self._locationEnabled;
     if (self._locationEnabled) {

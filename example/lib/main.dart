@@ -43,10 +43,11 @@ class _MyAppState extends State<MyApp> {
   showMap() {
     mapView.show(new MapOptions(showUserLocation: true, apiKey: "<your_key>"));
     mapView.updateAnnotations(<MapAnnotation>[
-      new MapAnnotation("1234", "Sydney", -33.86, 151.20),
+      new MapAnnotation("1234", "Cupertino", 37.33527476, 122.408227),
     ]);
     mapView.zoomToFit();
-    mapView.onLocationUpdated.listen((location) => mapView.zoomToFit());
+    mapView.onLocationUpdated
+        .listen((location) => print("Location updated $location"));
     mapView.onTouchAnnotation
         .listen((annotation) => print("Selected ${annotation.id}"));
     mapView.onMapTapped
