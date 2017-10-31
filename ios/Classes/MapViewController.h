@@ -21,6 +21,9 @@
 
 - (void)setCamera:(CLLocationCoordinate2D)location zoom:(float)zoom;
 - (void)updateAnnotations:(NSArray *)annotations;
+
+- (void)zoomTo:(NSArray *)annotations padding:(float)padding;
+
 - (void)zoomToAnnotations;
 
 - (NSArray *)visibleMarkers;

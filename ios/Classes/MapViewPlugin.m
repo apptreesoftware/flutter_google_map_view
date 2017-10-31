@@ -23,19 +23,18 @@
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([@"show" isEqualToString:call.method]) {
+    if ([@"setApiKey" isEqualToString:call.method]) {
+        [GMSServices provideAPIKey:call.arguments];
+    } else if ([@"show" isEqualToString:call.method]) {
         NSDictionary *args = call.arguments;
         NSDictionary *mapOptions = args[@"mapOptions"];
-        NSString *apiKey = mapOptions[@"apiKey"];
-        if (apiKey) {
-            [GMSServices provideAPIKey:apiKey];
-        }
         NSDictionary *cameraDict = mapOptions[@"cameraPosition"];
         
         MapViewController *vc = [[MapViewController alloc] initWithPlugin:self
                                                           navigationItems:[self buttonItemsFromActions:args[@"actions"]]
                                                            cameraPosition:[self cameraPositionFromDict:cameraDict]];
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
+        navController.navigationBar.translucent = NO;
         [self.host presentViewController:navController animated:true completion:nil];
         self.mapViewController = vc;
         [self.mapViewController setLocationEnabled:[call.arguments[@"showUserLocation"] boolValue]];
@@ -48,6 +47,9 @@
         result(@YES);
     } else if ([@"zoomToFit" isEqualToString:call.method]) {
         [self.mapViewController zoomToAnnotations];
+        result(@YES);
+    } else if ([@"zoomToAnnotations" isEqualToString:call.method]) {
+        [self handleZoomToAnnotations:call.arguments];
         result(@YES);
     } else if ([@"getCenter" isEqualToString:call.method]) {
         CLLocationCoordinate2D location = self.mapViewController.centerLocation;
@@ -93,6 +95,12 @@
         }
     }
     [self.mapViewController updateAnnotations:array];
+}
+
+- (void)handleZoomToAnnotations:(NSDictionary *)zoomToDict {
+    NSArray *annotations = zoomToDict[@"annotations"];
+    float padding = [zoomToDict[@"padding"] floatValue];
+    [self.mapViewController zoomTo:annotations padding:padding];
 }
 
 - (void)handleToolbar:(UIBarButtonItem *)item {

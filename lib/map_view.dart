@@ -21,7 +21,18 @@ class MapView {
     _channel.setMethodCallHandler(_handleMethod);
   }
 
+  static bool _apiKeySet = false;
+
+  static void setApiKey(String apiKey) {
+    MethodChannel c = const MethodChannel("com.apptreesoftware.map_view");
+    c.invokeMethod('setApiKey', apiKey);
+    _apiKeySet = true;
+  }
+
   void show(MapOptions mapOptions, {List<ToolbarAction> toolbarActions}) {
+    if (!_apiKeySet) {
+      throw "API Key must be set before calling `show`. Use MapView.setApiKey";
+    }
     List<Map> actions = [];
     if (toolbarActions != null) {
       actions = toolbarActions.map((t) => t.toMap).toList();
@@ -43,6 +54,11 @@ class MapView {
 
   void zoomToFit() {
     _channel.invokeMethod('zoomToFit');
+  }
+
+  void zoomTo(List<String> annotationIds, {double padding: 50.0}) {
+    _channel.invokeMethod('zoomToAnnotations',
+        {"annotations": annotationIds, "padding": padding});
   }
 
   void setCameraPosition(double latitude, double longitude, double zoom) {
@@ -150,7 +166,6 @@ class ClusterAnnotation extends MapAnnotation {
 }
 
 class MapOptions {
-  final String apiKey;
   final bool showUserLocation;
   final MapType mapType;
   final CameraPosition initialCameraPosition;
@@ -158,8 +173,7 @@ class MapOptions {
       const CameraPosition(const Location(45.5329661, -122.7059508), 12.0);
 
   MapOptions(
-      {this.apiKey: "",
-      this.showUserLocation: false,
+      {this.showUserLocation: false,
       this.mapType: MapType.google,
       this.initialCameraPosition: _defaultCamera});
 
@@ -167,7 +181,6 @@ class MapOptions {
     return {
       "showUserLocation": showUserLocation,
       "mapType": mapType.toString(),
-      "apiKey": apiKey,
       "cameraPosition": initialCameraPosition.toMap(),
     };
   }

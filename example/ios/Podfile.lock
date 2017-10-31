@@ -1,13 +1,13 @@
 PODS:
   - Flutter (1.0.0)
-  - GoogleMaps (2.1.1):
-    - GoogleMaps/Maps (= 2.1.1)
-  - GoogleMaps/Base (2.1.1)
-  - GoogleMaps/Maps (2.1.1):
+  - GoogleMaps (2.3.1):
+    - GoogleMaps/Maps (= 2.3.1)
+  - GoogleMaps/Base (2.3.1)
+  - GoogleMaps/Maps (2.3.1):
     - GoogleMaps/Base
   - map_view (0.0.1):
     - Flutter
-    - GoogleMaps (~> 2.1.1)
+    - GoogleMaps
 
 DEPENDENCIES:
   - Flutter (from `/Users/matthew/flutter/bin/cache/artifacts/engine/ios`)
@@ -21,8 +21,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: d674e78c937094a75ac71dd77e921e840bea3dbf
-  GoogleMaps: a5b5bbe47734e2443bde781a6aa64e69fdb6d785
-  map_view: 2a99096b5ff6a04c422e39c3b376e2872c57d6ed
+  GoogleMaps: c66a71058b9b1294bcdd5463a68e357fa50c079f
+  map_view: 2cc7fe6d6e9b9b158c46383ebca44e2d1b09abb8
 
 PODFILE CHECKSUM: 351e02e34b831289961ec3558a535cbd2c4965d2
 

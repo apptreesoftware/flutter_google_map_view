@@ -19,6 +19,7 @@
 @property (nonatomic, assign) MapViewPlugin *plugin;
 @property (nonatomic, retain) NSArray *navigationItems;
 @property (nonatomic, retain) GMSCameraPosition *initialCameraPosition;
+@property (nonatomic, retain) NSMutableDictionary *markerIDLookup;
 @end
 
 @implementation MapViewController
@@ -30,6 +31,7 @@
         self.plugin = plugin;
         self.navigationItems = items;
         self.initialCameraPosition = cameraPosition;
+        self.markerIDLookup = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -77,12 +79,14 @@
 
 - (void)updateAnnotations:(NSArray *)annotations {
     [self.mapView clear];
+    [self.markerIDLookup removeAllObjects];
     [self.markers removeAllObjects];
     self.markers = [NSMutableArray array];
     for (MapAnnotation *annotation in annotations) {
         GMSMarker *marker = [self createMarkerForAnnotation:annotation];
         marker.map = self.mapView;
         [self.markers addObject:marker];
+        self.markerIDLookup[marker.userData] = marker;
     }
 }
 
@@ -102,6 +106,34 @@
         marker.userData = annotation.identifier;
     }
     return marker;
+}
+
+- (void)zoomTo:(NSArray *)annotations padding:(float)padding {
+    GMSCoordinateBounds *coordinateBounds;
+
+    if (annotations.count == 1) {
+        GMSMarker *marker = self.markerIDLookup[annotations[0]];
+        if (!marker) {
+            return;
+        }
+        [self.mapView animateWithCameraUpdate:[GMSCameraUpdate setTarget:marker.position zoom: 18]];
+        return;
+    }
+    for (NSString *annotation in annotations) {
+        GMSMarker *marker = self.markerIDLookup[annotation];
+        if (!marker) {
+            return;
+        }
+        if (!coordinateBounds) {
+            coordinateBounds = [[GMSCoordinateBounds alloc] initWithCoordinate:marker.position coordinate:marker.position];
+            continue;
+        }
+        coordinateBounds = [coordinateBounds includingCoordinate:marker.position];
+    }
+    if (coordinateBounds && coordinateBounds.isValid) {
+        GMSCameraUpdate *cameraUpdate = [GMSCameraUpdate fitBounds:coordinateBounds withEdgeInsets:UIEdgeInsetsMake(padding, padding, padding, padding)];
+        [self.mapView animateWithCameraUpdate:cameraUpdate];
+    }
 }
 
 - (void)zoomToAnnotations {
