@@ -13,7 +13,7 @@
     if (self) {
         self.identifier = dictionary[@"id"];
         self.title = dictionary[@"title"];
-        self.coordinate = CLLocationCoordinate2DMake([dictionary[@"latitude"] intValue], [dictionary[@"longitude"] intValue]);
+        self.coordinate = CLLocationCoordinate2DMake([dictionary[@"latitude"] doubleValue], [dictionary[@"longitude"] doubleValue]);
     }
     return self;
 }

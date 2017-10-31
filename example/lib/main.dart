@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
             showUserLocation: true,
             initialCameraPosition: new CameraPosition(
                 new Location(45.5235258, -122.6732493), 14.0),
-            apiKey: "<your_key>"),
+            apiKey: "<your_api_key>"),
         toolbarActions: [new ToolbarAction("Close", 1)]);
     mapView.updateAnnotations(<MapAnnotation>[
       new MapAnnotation("1234", "Cupertino", 37.33527476, 122.408227),
