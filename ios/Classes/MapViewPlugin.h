@@ -10,8 +10,6 @@
 @property (nonatomic, assign) FlutterMethodChannel *channel;
 @property (nonatomic, retain) MapViewController *mapViewController;
 
-- (void)handleDismiss;
-
 - (void)locationDidUpdate:(CLLocation *)location;
 - (void)annotationTapped:(NSString *)identifier;
 

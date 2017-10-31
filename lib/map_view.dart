@@ -15,7 +15,7 @@ class MapView {
   StreamController<int> _toolbarActionStreamController =
       new StreamController.broadcast();
 
-  List<MapAnnotation> _annotations;
+  Map<String, MapAnnotation> _annotations = {};
 
   MapView() {
     _channel.setMethodCallHandler(_handleMethod);
@@ -35,7 +35,8 @@ class MapView {
   }
 
   void updateAnnotations(List<MapAnnotation> annotations) {
-    _annotations = annotations;
+    _annotations.clear();
+    annotations.forEach((a) => _annotations[a.id] = a);
     _channel.invokeMethod('setAnnotations',
         annotations.map((a) => a.toMap()).toList(growable: false));
   }
@@ -56,6 +57,16 @@ class MapView {
 
   Future<double> get zoomLevel async {
     return await _channel.invokeMethod("getZoomLevel");
+  }
+
+  Future<List<MapAnnotation>> get visibleAnnotations async {
+    List<String> ids = await _channel.invokeMethod("getVisibleMarkers");
+    var annotations = <MapAnnotation>[];
+    for (var id in ids) {
+      var annotation = _annotations[id];
+      annotations.add(annotation);
+    }
+    return annotations;
   }
 
   Stream<MapAnnotation> get onTouchAnnotation =>
@@ -79,7 +90,7 @@ class MapView {
         return new Future.value("");
       case "annotationTapped":
         String id = call.arguments;
-        var annotation = _annotations?.firstWhere((a) => a.id == id);
+        var annotation = _annotations[id];
         if (annotation != null) {
           _annotationStreamController.add(annotation);
         }
@@ -142,17 +153,22 @@ class MapOptions {
   final String apiKey;
   final bool showUserLocation;
   final MapType mapType;
+  final CameraPosition initialCameraPosition;
+  static const CameraPosition _defaultCamera =
+      const CameraPosition(const Location(45.5329661, -122.7059508), 12.0);
 
   MapOptions(
       {this.apiKey: "",
       this.showUserLocation: false,
-      this.mapType: MapType.google});
+      this.mapType: MapType.google,
+      this.initialCameraPosition: _defaultCamera});
 
   Map<String, dynamic> toMap() {
     return {
       "showUserLocation": showUserLocation,
       "mapType": mapType.toString(),
-      "apiKey": apiKey
+      "apiKey": apiKey,
+      "cameraPosition": initialCameraPosition.toMap(),
     };
   }
 }
@@ -161,7 +177,7 @@ class Location {
   final double latitude;
   final double longitude;
 
-  Location(this.latitude, this.longitude);
+  const Location(this.latitude, this.longitude);
   factory Location.fromMap(Map map) {
     return new Location(map["latitude"], map["longitude"]);
   }
@@ -180,7 +196,7 @@ class CameraPosition {
   final Location center;
   final double zoom;
 
-  CameraPosition(this.center, this.zoom);
+  const CameraPosition(this.center, this.zoom);
 
   factory CameraPosition.fromMap(Map map) {
     return new CameraPosition(new Location.fromMap(map), map["zoom"]);

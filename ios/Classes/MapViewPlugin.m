@@ -30,8 +30,11 @@
         if (apiKey) {
             [GMSServices provideAPIKey:apiKey];
         }
+        NSDictionary *cameraDict = mapOptions[@"cameraPosition"];
+        
         MapViewController *vc = [[MapViewController alloc] initWithPlugin:self
-                                                          navigationItems:[self buttonItemsFromActions:args[@"actions"]]];
+                                                          navigationItems:[self buttonItemsFromActions:args[@"actions"]]
+                                                           cameraPosition:[self cameraPositionFromDict:cameraDict]];
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
         [self.host presentViewController:navController animated:true completion:nil];
         self.mapViewController = vc;
@@ -98,7 +101,7 @@
 
 - (void)handleSetCamera:(NSDictionary *)cameraUpdate {
     CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([cameraUpdate[@"latitude"] doubleValue], [cameraUpdate[@"longitude"] doubleValue]);
-    [self.mapViewController setCamera:coordinate zoom:[cameraUpdate[@"zoom"] floatValue]];
+    [self.mapViewContro ller setCamera:coordinate zoom:[cameraUpdate[@"zoom"] floatValue]];
 }
 
 - (void)locationDidUpdate:(CLLocation *)location {
@@ -119,6 +122,14 @@
             @"longitude": @(position.target.longitude),
             @"zoom": @(position.zoom)
     }];
+}
+
+- (GMSCameraPosition *)cameraPositionFromDict:(NSDictionary *)dict {
+    double latitude = [dict[@"latitude"] doubleValue];
+    double longitude = [dict[@"longitude"] doubleValue];
+    float zoom = [dict[@"zoom"] floatValue];
+    GMSCameraPosition *camera = [GMSCameraPosition cameraWithTarget:CLLocationCoordinate2DMake(latitude, longitude) zoom:zoom];
+    return camera;
 }
 
 @end

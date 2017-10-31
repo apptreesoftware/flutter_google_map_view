@@ -18,15 +18,18 @@
 @property (nonatomic) BOOL observingLocation;
 @property (nonatomic, assign) MapViewPlugin *plugin;
 @property (nonatomic, retain) NSArray *navigationItems;
+@property (nonatomic, retain) GMSCameraPosition *initialCameraPosition;
 @end
 
 @implementation MapViewController
 
-- (id)initWithPlugin:(MapViewPlugin *)plugin navigationItems:(NSArray *)items {
+- (id)initWithPlugin:(MapViewPlugin *)plugin
+     navigationItems:(NSArray *)items cameraPosition:(GMSCameraPosition *)cameraPosition {
     self = [super init];
     if (self) {
         self.plugin = plugin;
         self.navigationItems = items;
+        self.initialCameraPosition = cameraPosition;
     }
     return self;
 }
@@ -36,7 +39,6 @@
 }
 
 - (void)dealloc {
-    NSLog(@"dealloc");
     [self stopMonitoringLocationChanges];
 }
 
@@ -57,13 +59,8 @@
 }
 
 - (void)loadView {
-    // Create a GMSCameraPosition that tells the map to display the
-    // coordinate -33.86,151.20 at zoom level 6.
-    GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude:-33.86
-                                                            longitude:151.20
-                                                                 zoom:6];
     self.markers = [NSMutableArray array];
-    self.mapView = [GMSMapView mapWithFrame:CGRectZero camera:camera];
+    self.mapView = [GMSMapView mapWithFrame:CGRectZero camera:self.initialCameraPosition];
     self.view = self.mapView;
 
     // Creates a marker in the center of the map.

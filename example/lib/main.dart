@@ -41,7 +41,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   showMap() {
-    mapView.show(new MapOptions(showUserLocation: true, apiKey: "<your_key>"),
+    mapView.show(
+        new MapOptions(
+            showUserLocation: true,
+            initialCameraPosition: new CameraPosition(
+                new Location(45.5235258, -122.6732493), 14.0),
+            apiKey: "<your_key>"),
         toolbarActions: [new ToolbarAction("Close", 1)]);
     mapView.updateAnnotations(<MapAnnotation>[
       new MapAnnotation("1234", "Cupertino", 37.33527476, 122.408227),
@@ -65,8 +70,10 @@ class _MyAppState extends State<MyApp> {
   _handleDismiss() async {
     double zoomLevel = await mapView.zoomLevel;
     Location centerLocation = await mapView.centerLocation;
+    List<MapAnnotation> visibleAnnotations = await mapView.visibleAnnotations;
     print("Zoom Level: $zoomLevel");
     print("Center: $centerLocation");
+    print("Visible Annotation Count: ${visibleAnnotations.length}");
     mapView.dismiss();
   }
 }

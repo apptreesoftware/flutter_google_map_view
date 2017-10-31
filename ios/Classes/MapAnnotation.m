@@ -11,6 +11,7 @@
 - (instancetype) initWithDictionary:(NSDictionary *)dictionary {
     self = [super init];
     if (self) {
+        self.identifier = dictionary[@"id"];
         self.title = dictionary[@"title"];
         self.coordinate = CLLocationCoordinate2DMake([dictionary[@"latitude"] intValue], [dictionary[@"longitude"] intValue]);
     }

@@ -178,6 +178,7 @@
 		97C146E61CF9000F007C117D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = "";
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "The Chromium Authors";
 				TargetAttributes = {

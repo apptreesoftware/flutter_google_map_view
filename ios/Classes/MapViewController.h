@@ -13,7 +13,9 @@
 
 @interface MapViewController : UIViewController <GMSMapViewDelegate>
 
-- (id)initWithPlugin:(MapViewPlugin *)plugin navigationItems:(NSArray *)items;
+- (id)initWithPlugin:(MapViewPlugin *)plugin
+     navigationItems:(NSArray *)items
+      cameraPosition:(GMSCameraPosition *)cameraPosition;
 
 - (void)shutdown;
 
