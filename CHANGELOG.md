@@ -14,3 +14,7 @@
 * Support for getting current visible pins
 * Support for toolbar items
 
+
+## [0.0.2] - 11-07-2017
+
+* Improved examples
