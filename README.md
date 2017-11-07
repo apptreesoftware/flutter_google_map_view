@@ -40,3 +40,58 @@ Please note: API changes are likely as we continue to develop this plugin.
 - [ ] Bounds geometry functions
 - [ ] Polyline support
 
+## Usage examples
+
+#### Show a map ( with a toolbar )
+    mapView.show(
+        new MapOptions(
+            showUserLocation: true,
+            initialCameraPosition: new CameraPosition(
+                new Location(45.5235258, -122.6732493), 14.0),
+            title: "Recently Visited"),
+        toolbarActions: [new ToolbarAction("Close", 1)]);
+#### Get notified when the map is ready
+    mapView.onMapReady.listen((_) {
+      print("Map ready");
+    });
+#### Add multiple pins to the map 
+    mapView.setMarkers(<Marker>[
+      new Marker("1", "Work", 45.523970, -122.663081, color: Colors.blue),
+      new Marker("2", "Nossa Familia Coffee", 45.528788, -122.684633),
+    ]);
+
+#### Add a single pin to the map
+    mapView.addMarker(new Marker("3", "10 Barrel", 45.5259467, -122.687747,
+        color: Colors.purple));
+        
+#### Zoom to fit all the pins on the map
+    mapView.zoomToFit(padding: 100);
+
+#### Receive location updates of the users current location
+    mapView.onLocationUpdated
+        .listen((location) => print("Location updated $location"));
+
+#### Receive marker touches
+    mapView.onTouchAnnotation.listen((marker) => print("marker tapped"));
+
+#### Receive map touches
+    mapView.onMapTapped
+        .listen((location) => print("Touched location $location"));
+
+#### Receive camera change updates
+    mapView.onCameraChanged.listen((cameraPosition) =>
+        this.setState(() => this.cameraPosition = cameraPosition));
+
+#### Receive toolbar actions
+    mapView.onToolbarAction.listen((id) {
+      if (id == 1) {
+        _handleDismiss();
+      }
+    });
+    
+#### Get the current zoom level
+    double zoomLevel = await mapView.zoomLevel;
+#### Get the maps center location
+    Location centerLocation = await mapView.centerLocation;
+#### Get the visible markers on screen
+    List<Marker> visibleAnnotations = await mapView.visibleAnnotations;

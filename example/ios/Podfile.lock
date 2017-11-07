@@ -10,12 +10,12 @@ PODS:
     - GoogleMaps
 
 DEPENDENCIES:
-  - Flutter (from `/Users/matthew/flutter/bin/cache/artifacts/engine/ios`)
+  - Flutter (from `/users/matthew/flutter/bin/cache/artifacts/engine/ios`)
   - map_view (from `/Users/matthew/Projects/AppTree/plugins/map_view/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
-    :path: /Users/matthew/flutter/bin/cache/artifacts/engine/ios
+    :path: /users/matthew/flutter/bin/cache/artifacts/engine/ios
   map_view:
     :path: /Users/matthew/Projects/AppTree/plugins/map_view/ios
 
