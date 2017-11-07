@@ -2,7 +2,7 @@ name: map_view
 description: A flutter plugin for displaying native Google Maps.
 version: 0.0.1
 author: Matthew Smith<matthew.smith@apptree.cloud>
-homepage:
+homepage: https://github.com/apptreesoftware/flutter_google_map_view
 
 dependencies:
   flutter:
