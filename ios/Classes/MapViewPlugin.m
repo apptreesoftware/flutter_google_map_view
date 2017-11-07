@@ -25,11 +25,12 @@
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     if ([@"setApiKey" isEqualToString:call.method]) {
         [GMSServices provideAPIKey:call.arguments];
+        result(@YES);
     } else if ([@"show" isEqualToString:call.method]) {
         NSDictionary *args = call.arguments;
         NSDictionary *mapOptions = args[@"mapOptions"];
         NSDictionary *cameraDict = mapOptions[@"cameraPosition"];
-        
+        self.mapTitle = mapOptions[@"title"];
         MapViewController *vc = [[MapViewController alloc] initWithPlugin:self
                                                           navigationItems:[self buttonItemsFromActions:args[@"actions"]]
                                                            cameraPosition:[self cameraPositionFromDict:cameraDict]];
@@ -42,11 +43,14 @@
     } else if ([@"setAnnotations" isEqualToString:call.method]) {
         [self handleSetAnnotations:call.arguments];
         result(@YES);
+    } else if ([@"addAnnotation" isEqualToString:call.method]) {
+        [self handleAddAnnotation:call.arguments];
+        result(@YES);
     } else if ([@"setCamera" isEqualToString:call.method]) {
         [self handleSetCamera:call.arguments];
         result(@YES);
     } else if ([@"zoomToFit" isEqualToString:call.method]) {
-        [self.mapViewController zoomToAnnotations];
+        [self.mapViewController zoomToAnnotations:[((NSNumber *) call.arguments) intValue]];
         result(@YES);
     } else if ([@"zoomToAnnotations" isEqualToString:call.method]) {
         [self handleZoomToAnnotations:call.arguments];
@@ -97,6 +101,13 @@
     [self.mapViewController updateAnnotations:array];
 }
 
+- (void)handleAddAnnotation:(NSDictionary *)dict {
+    MapAnnotation *annotation = [MapAnnotation annotationFromDictionary:dict];
+    if (annotation) {
+        [self.mapViewController addAnnotation:annotation];
+    }
+}
+
 - (void)handleZoomToAnnotations:(NSDictionary *)zoomToDict {
     NSArray *annotations = zoomToDict[@"annotations"];
     float padding = [zoomToDict[@"padding"] floatValue];
@@ -110,6 +121,10 @@
 - (void)handleSetCamera:(NSDictionary *)cameraUpdate {
     CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([cameraUpdate[@"latitude"] doubleValue], [cameraUpdate[@"longitude"] doubleValue]);
     [self.mapViewController setCamera:coordinate zoom:[cameraUpdate[@"zoom"] floatValue]];
+}
+
+- (void)onMapReady {
+    [self.channel invokeMethod:@"onMapReady" arguments:nil];
 }
 
 - (void)locationDidUpdate:(CLLocation *)location {

@@ -3,6 +3,7 @@
 //
 
 #import "MapAnnotation.h"
+#import "UIColor+Extensions.h"
 
 
 @implementation MapAnnotation {
@@ -14,6 +15,7 @@
         self.identifier = dictionary[@"id"];
         self.title = dictionary[@"title"];
         self.coordinate = CLLocationCoordinate2DMake([dictionary[@"latitude"] doubleValue], [dictionary[@"longitude"] doubleValue]);
+        self.color = [UIColor colorFromDictionary:dictionary[@"color"]];
     }
     return self;
 }

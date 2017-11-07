@@ -32,6 +32,7 @@
         self.navigationItems = items;
         self.initialCameraPosition = cameraPosition;
         self.markerIDLookup = [NSMutableDictionary dictionary];
+        self.title = plugin.mapTitle;
     }
     return self;
 }
@@ -61,7 +62,6 @@
 }
 
 - (void)loadView {
-    self.markers = [NSMutableArray array];
     self.mapView = [GMSMapView mapWithFrame:CGRectZero camera:self.initialCameraPosition];
     self.view = self.mapView;
 
@@ -71,6 +71,7 @@
     if (self._locationEnabled) {
         [self monitorLocationChanges];
     }
+    [self.plugin onMapReady];
 }
 
 - (void)setCamera:(CLLocationCoordinate2D)location zoom:(float)zoom {
@@ -80,14 +81,18 @@
 - (void)updateAnnotations:(NSArray *)annotations {
     [self.mapView clear];
     [self.markerIDLookup removeAllObjects];
-    [self.markers removeAllObjects];
-    self.markers = [NSMutableArray array];
     for (MapAnnotation *annotation in annotations) {
         GMSMarker *marker = [self createMarkerForAnnotation:annotation];
         marker.map = self.mapView;
         [self.markers addObject:marker];
         self.markerIDLookup[marker.userData] = marker;
     }
+}
+
+- (void)addAnnotation:(MapAnnotation *)annotation {
+    GMSMarker *marker = [self createMarkerForAnnotation:annotation];
+    marker.map = self.mapView;
+    self.markerIDLookup[marker.userData] = marker;
 }
 
 - (GMSMarker *)createMarkerForAnnotation:(MapAnnotation *)annotation {
@@ -97,12 +102,12 @@
         marker.position = annotation.coordinate;
         marker.title = annotation.title;
         marker.snippet = [NSString stringWithFormat:@"%i", clusterAnnotation.clusterCount];
-        marker.icon = [GMSMarker markerImageWithColor:[UIColor blueColor]];
+        marker.icon = [GMSMarker markerImageWithColor:annotation.color];
         marker.userData = annotation.identifier;
     } else {
         marker.position = annotation.coordinate;
         marker.title = annotation.title;
-        marker.icon = [GMSMarker markerImageWithColor:[UIColor blueColor]];
+        marker.icon = [GMSMarker markerImageWithColor:annotation.color];
         marker.userData = annotation.identifier;
     }
     return marker;
@@ -122,7 +127,7 @@
     for (NSString *annotation in annotations) {
         GMSMarker *marker = self.markerIDLookup[annotation];
         if (!marker) {
-            return;
+            continue;
         }
         if (!coordinateBounds) {
             coordinateBounds = [[GMSCoordinateBounds alloc] initWithCoordinate:marker.position coordinate:marker.position];
@@ -131,14 +136,14 @@
         coordinateBounds = [coordinateBounds includingCoordinate:marker.position];
     }
     if (coordinateBounds && coordinateBounds.isValid) {
-        GMSCameraUpdate *cameraUpdate = [GMSCameraUpdate fitBounds:coordinateBounds withEdgeInsets:UIEdgeInsetsMake(padding, padding, padding, padding)];
+        GMSCameraUpdate *cameraUpdate = [GMSCameraUpdate fitBounds:coordinateBounds withPadding:padding];
         [self.mapView animateWithCameraUpdate:cameraUpdate];
     }
 }
 
-- (void)zoomToAnnotations {
+- (void)zoomToAnnotations:(int)padding {
     GMSCoordinateBounds *coordinateBounds;
-    for (GMSMarker *marker in self.markers) {
+    for (GMSMarker *marker in self.markerIDLookup.allValues) {
         if (!coordinateBounds) {
             coordinateBounds = [[GMSCoordinateBounds alloc] initWithCoordinate:marker.position coordinate:marker.position];
             continue;
@@ -147,14 +152,16 @@
     }
     if (self.mapView.myLocation) {
         if (coordinateBounds == nil) {
-            GMSCameraUpdate *cameraUpdate = [GMSCameraUpdate setTarget:self.mapView.myLocation.coordinate zoom: 12];
+            GMSCameraUpdate *cameraUpdate = [GMSCameraUpdate setTarget:self.mapView.myLocation.coordinate
+                                                                  zoom: 12];
             [self.mapView animateWithCameraUpdate:cameraUpdate];
             return;
         }
         coordinateBounds = [coordinateBounds includingCoordinate:self.mapView.myLocation.coordinate];
     }
     if (coordinateBounds && coordinateBounds.isValid) {
-        GMSCameraUpdate *cameraUpdate = [GMSCameraUpdate fitBounds:coordinateBounds withEdgeInsets:UIEdgeInsetsMake(50.0, 50.0, 50.0, 50.0)];
+        GMSCameraUpdate *cameraUpdate = [GMSCameraUpdate fitBounds:coordinateBounds
+                                                    withPadding:padding];
         [self.mapView animateWithCameraUpdate:cameraUpdate];
     }
 }
@@ -180,7 +187,7 @@
 
 - (BOOL)mapView:(GMSMapView *)mapView didTapMarker:(GMSMarker *)marker {
     [self.plugin annotationTapped:marker.userData];
-    return YES;
+    return NO;
 }
 
 - (void)mapView:(GMSMapView *)mapView didTapAtCoordinate:(CLLocationCoordinate2D)coordinate {
@@ -204,7 +211,7 @@
     GMSVisibleRegion region = self.mapView.projection.visibleRegion;
     GMSCoordinateBounds *bounds = [[GMSCoordinateBounds alloc]initWithRegion:region];
     NSMutableArray *visibleMarkers = [NSMutableArray array];
-    for (GMSMarker *marker in self.markers) {
+    for (GMSMarker *marker in self.markerIDLookup.allValues) {
         if ([bounds containsCoordinate:marker.position]) {
             [visibleMarkers addObject:marker.userData];
         }

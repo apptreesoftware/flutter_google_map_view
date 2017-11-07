@@ -10,6 +10,7 @@
 @property (nonatomic, retain) NSString *identifier;
 @property (nonatomic, retain) NSString *title;
 @property (nonatomic, assign) CLLocationCoordinate2D coordinate;
+@property (nonatomic, retain) UIColor *color;
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;
 

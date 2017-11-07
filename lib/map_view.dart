@@ -1,10 +1,10 @@
 import 'dart:async';
-
+import 'dart:ui';
 import 'package:flutter/services.dart';
 
 class MapView {
   MethodChannel _channel = const MethodChannel("com.apptreesoftware.map_view");
-  StreamController<MapAnnotation> _annotationStreamController =
+  StreamController<Marker> _annotationStreamController =
       new StreamController.broadcast();
   StreamController<Location> _locationChangeStreamController =
       new StreamController.broadcast();
@@ -14,8 +14,10 @@ class MapView {
       new StreamController.broadcast();
   StreamController<int> _toolbarActionStreamController =
       new StreamController.broadcast();
+  StreamController<Null> _mapReadyStreamController =
+      new StreamController.broadcast();
 
-  Map<String, MapAnnotation> _annotations = {};
+  Map<String, Marker> _annotations = {};
 
   MapView() {
     _channel.setMethodCallHandler(_handleMethod);
@@ -45,15 +47,23 @@ class MapView {
     _channel.invokeMethod('dismiss');
   }
 
-  void updateAnnotations(List<MapAnnotation> annotations) {
+  void setMarkers(List<Marker> annotations) {
     _annotations.clear();
     annotations.forEach((a) => _annotations[a.id] = a);
     _channel.invokeMethod('setAnnotations',
         annotations.map((a) => a.toMap()).toList(growable: false));
   }
 
-  void zoomToFit() {
-    _channel.invokeMethod('zoomToFit');
+  void addMarker(Marker marker) {
+    if (_annotations.containsKey(marker.id)) {
+      return;
+    }
+    _annotations[marker.id] = marker;
+    _channel.invokeMethod('addAnnotation', marker.toMap());
+  }
+
+  void zoomToFit({int padding: 50}) {
+    _channel.invokeMethod('zoomToFit', padding);
   }
 
   void zoomTo(List<String> annotationIds, {double padding: 50.0}) {
@@ -75,9 +85,9 @@ class MapView {
     return await _channel.invokeMethod("getZoomLevel");
   }
 
-  Future<List<MapAnnotation>> get visibleAnnotations async {
+  Future<List<Marker>> get visibleAnnotations async {
     List<String> ids = await _channel.invokeMethod("getVisibleMarkers");
-    var annotations = <MapAnnotation>[];
+    var annotations = <Marker>[];
     for (var id in ids) {
       var annotation = _annotations[id];
       annotations.add(annotation);
@@ -85,8 +95,7 @@ class MapView {
     return annotations;
   }
 
-  Stream<MapAnnotation> get onTouchAnnotation =>
-      _annotationStreamController.stream;
+  Stream<Marker> get onTouchAnnotation => _annotationStreamController.stream;
 
   Stream<Location> get onLocationUpdated =>
       _locationChangeStreamController.stream;
@@ -97,9 +106,13 @@ class MapView {
 
   Stream<int> get onToolbarAction => _toolbarActionStreamController.stream;
 
+  Stream<Null> get onMapReady => _mapReadyStreamController.stream;
+
   Future<dynamic> _handleMethod(MethodCall call) async {
-    print("Received method call ${call.method}");
     switch (call.method) {
+      case "onMapReady":
+        _mapReadyStreamController.add(null);
+        return new Future.value("");
       case "locationUpdated":
         Map args = call.arguments;
         _locationChangeStreamController.add(new Location.fromMap(args));
@@ -127,13 +140,17 @@ class MapView {
   }
 }
 
-class MapAnnotation {
+class Marker {
   final String id;
   final String title;
   final double latitude;
   final double longitude;
+  final Color color;
 
-  MapAnnotation(this.id, this.title, this.latitude, this.longitude);
+  static const Color _defaultColor = const Color.fromARGB(1, 255, 0, 0);
+
+  Marker(this.id, this.title, this.latitude, this.longitude,
+      {this.color: _defaultColor});
 
   Map<String, dynamic> toMap() {
     return {
@@ -141,47 +158,49 @@ class MapAnnotation {
       "title": title,
       "latitude": latitude,
       "longitude": longitude,
-      "type": "pin"
+      "type": "pin",
+      "color": {
+        "r": color.red,
+        "g": color.green,
+        "b": color.blue,
+        "a": color.alpha
+      }
     };
   }
 }
 
-class ClusterAnnotation extends MapAnnotation {
+class Cluster extends Marker {
   final int clusterCount;
 
-  ClusterAnnotation(String id, String title, double latitude, double longitude,
-      this.clusterCount)
-      : super(id, title, latitude, longitude);
+  Cluster(String id, String title, double latitude, double longitude,
+      this.clusterCount, Color color)
+      : super(id, title, latitude, longitude, color: color);
 
   Map<String, dynamic> toMap() {
-    return {
-      "id": id,
-      "title": title,
-      "latitude": latitude,
-      "longitude": longitude,
-      "type": "cluster",
-      "clusterCount": clusterCount
-    };
+    var map = super.toMap();
+    map["type"] = "cluster";
+    map["clusterCount"] = clusterCount;
+    return map;
   }
 }
 
 class MapOptions {
   final bool showUserLocation;
-  final MapType mapType;
   final CameraPosition initialCameraPosition;
+  final String title;
   static const CameraPosition _defaultCamera =
       const CameraPosition(const Location(45.5329661, -122.7059508), 12.0);
 
   MapOptions(
       {this.showUserLocation: false,
-      this.mapType: MapType.google,
-      this.initialCameraPosition: _defaultCamera});
+      this.initialCameraPosition: _defaultCamera,
+      this.title: ""});
 
   Map<String, dynamic> toMap() {
     return {
       "showUserLocation": showUserLocation,
-      "mapType": mapType.toString(),
       "cameraPosition": initialCameraPosition.toMap(),
+      "title": title
     };
   }
 }

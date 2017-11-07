@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:map_view/map_view.dart';
 
 void main() {
-  MapView.setApiKey("<your_key>");
+  MapView.setApiKey("<your_api_key>");
   runApp(new MyApp());
 }
 
@@ -14,6 +16,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   MapView mapView = new MapView();
   CameraPosition cameraPosition;
+  var compositeSubscription = new CompositeSubscription();
 
   @override
   initState() {
@@ -26,7 +29,7 @@ class _MyAppState extends State<MyApp> {
     return new MaterialApp(
       home: new Scaffold(
           appBar: new AppBar(
-            title: new Text('Plugin example app'),
+            title: new Text('Map View Example'),
           ),
           body: new Column(
             children: <Widget>[
@@ -44,39 +47,87 @@ class _MyAppState extends State<MyApp> {
   showMap() {
     mapView.show(
         new MapOptions(
-          showUserLocation: true,
-          initialCameraPosition:
-              new CameraPosition(new Location(45.5235258, -122.6732493), 14.0),
-        ),
+            showUserLocation: true,
+            initialCameraPosition: new CameraPosition(
+                new Location(45.5235258, -122.6732493), 14.0),
+            title: "Recently Visited"),
         toolbarActions: [new ToolbarAction("Close", 1)]);
-    mapView.updateAnnotations(<MapAnnotation>[
-      new MapAnnotation("1234", "Pin 1", 38.33527476, -122.408227),
-      new MapAnnotation("2345", "Pin 2", 38.0322, -122.5443),
-      new MapAnnotation("4567", "Pin 3", 38.01113, -122.2246),
-    ]);
-    mapView.zoomToFit();
-    mapView.onLocationUpdated
+
+    var sub = mapView.onMapReady.listen((_) {
+      mapView.setMarkers(<Marker>[
+        new Marker("1", "Work", 45.523970, -122.663081, color: Colors.blue),
+        new Marker("2", "Nossa Familia Coffee", 45.528788, -122.684633),
+      ]);
+      mapView.addMarker(new Marker("3", "10 Barrel", 45.5259467, -122.687747,
+          color: Colors.purple));
+
+      mapView.zoomToFit(padding: 100);
+    });
+    compositeSubscription.add(sub);
+
+    sub = mapView.onLocationUpdated
         .listen((location) => print("Location updated $location"));
-    mapView.onTouchAnnotation.listen(
-        (annotation) => mapView.zoomTo(["1234", "4567"], padding: 75.0));
-    mapView.onMapTapped
+    compositeSubscription.add(sub);
+
+    sub = mapView.onTouchAnnotation
+        .listen((annotation) => print("annotation tapped"));
+    compositeSubscription.add(sub);
+
+    sub = mapView.onMapTapped
         .listen((location) => print("Touched location $location"));
-    mapView.onCameraChanged.listen((cameraPosition) =>
+    compositeSubscription.add(sub);
+
+    sub = mapView.onCameraChanged.listen((cameraPosition) =>
         this.setState(() => this.cameraPosition = cameraPosition));
-    mapView.onToolbarAction.listen((id) {
+    compositeSubscription.add(sub);
+
+    sub = mapView.onToolbarAction.listen((id) {
       if (id == 1) {
         _handleDismiss();
       }
     });
+    compositeSubscription.add(sub);
   }
 
   _handleDismiss() async {
     double zoomLevel = await mapView.zoomLevel;
     Location centerLocation = await mapView.centerLocation;
-    List<MapAnnotation> visibleAnnotations = await mapView.visibleAnnotations;
+    List<Marker> visibleAnnotations = await mapView.visibleAnnotations;
     print("Zoom Level: $zoomLevel");
     print("Center: $centerLocation");
     print("Visible Annotation Count: ${visibleAnnotations.length}");
     mapView.dismiss();
+    compositeSubscription.cancel();
+  }
+}
+
+class CompositeSubscription {
+  Set<StreamSubscription> _subscriptions = new Set();
+
+  void cancel() {
+    for (var n in this._subscriptions) {
+      n.cancel();
+    }
+    this._subscriptions = new Set();
+  }
+
+  void add(StreamSubscription subscription) {
+    this._subscriptions.add(subscription);
+  }
+
+  void addAll(Iterable<StreamSubscription> subs) {
+    _subscriptions.addAll(subs);
+  }
+
+  bool remove(StreamSubscription subscription) {
+    return this._subscriptions.remove(subscription);
+  }
+
+  bool contains(StreamSubscription subscription) {
+    return this._subscriptions.contains(subscription);
+  }
+
+  List<StreamSubscription> toList() {
+    return this._subscriptions.toList();
   }
 }

@@ -10,6 +10,7 @@
 #import <GoogleMaps/GoogleMaps/GMSMapView.h>
 
 @class MapViewPlugin;
+@class MapAnnotation;
 
 @interface MapViewController : UIViewController <GMSMapViewDelegate>
 
@@ -22,9 +23,11 @@
 - (void)setCamera:(CLLocationCoordinate2D)location zoom:(float)zoom;
 - (void)updateAnnotations:(NSArray *)annotations;
 
+- (void)addAnnotation:(MapAnnotation *)annotation;
+
 - (void)zoomTo:(NSArray *)annotations padding:(float)padding;
 
-- (void)zoomToAnnotations;
+- (void)zoomToAnnotations:(int)padding;
 
 - (NSArray *)visibleMarkers;
 
