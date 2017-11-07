@@ -1,6 +1,11 @@
 import 'dart:async';
-import 'dart:ui';
+
 import 'package:flutter/services.dart';
+import 'package:map_view/camera_position.dart';
+import 'package:map_view/location.dart';
+import 'package:map_view/map_options.dart';
+import 'package:map_view/marker.dart';
+import 'package:map_view/toolbar_action.dart';
 
 class MapView {
   MethodChannel _channel = const MethodChannel("com.apptreesoftware.map_view");
@@ -138,121 +143,4 @@ class MapView {
     }
     return new Future.value("");
   }
-}
-
-class Marker {
-  final String id;
-  final String title;
-  final double latitude;
-  final double longitude;
-  final Color color;
-
-  static const Color _defaultColor = const Color.fromARGB(1, 255, 0, 0);
-
-  Marker(this.id, this.title, this.latitude, this.longitude,
-      {this.color: _defaultColor});
-
-  Map<String, dynamic> toMap() {
-    return {
-      "id": id,
-      "title": title,
-      "latitude": latitude,
-      "longitude": longitude,
-      "type": "pin",
-      "color": {
-        "r": color.red,
-        "g": color.green,
-        "b": color.blue,
-        "a": color.alpha
-      }
-    };
-  }
-}
-
-class Cluster extends Marker {
-  final int clusterCount;
-
-  Cluster(String id, String title, double latitude, double longitude,
-      this.clusterCount, Color color)
-      : super(id, title, latitude, longitude, color: color);
-
-  Map<String, dynamic> toMap() {
-    var map = super.toMap();
-    map["type"] = "cluster";
-    map["clusterCount"] = clusterCount;
-    return map;
-  }
-}
-
-class MapOptions {
-  final bool showUserLocation;
-  final CameraPosition initialCameraPosition;
-  final String title;
-  static const CameraPosition _defaultCamera =
-      const CameraPosition(const Location(45.5329661, -122.7059508), 12.0);
-
-  MapOptions(
-      {this.showUserLocation: false,
-      this.initialCameraPosition: _defaultCamera,
-      this.title: ""});
-
-  Map<String, dynamic> toMap() {
-    return {
-      "showUserLocation": showUserLocation,
-      "cameraPosition": initialCameraPosition.toMap(),
-      "title": title
-    };
-  }
-}
-
-class Location {
-  final double latitude;
-  final double longitude;
-
-  const Location(this.latitude, this.longitude);
-  factory Location.fromMap(Map map) {
-    return new Location(map["latitude"], map["longitude"]);
-  }
-
-  Map toMap() {
-    return {"latitude": this.latitude, "longitude": this.longitude};
-  }
-
-  @override
-  String toString() {
-    return 'Location{latitude: $latitude, longitude: $longitude}';
-  }
-}
-
-class CameraPosition {
-  final Location center;
-  final double zoom;
-
-  const CameraPosition(this.center, this.zoom);
-
-  factory CameraPosition.fromMap(Map map) {
-    return new CameraPosition(new Location.fromMap(map), map["zoom"]);
-  }
-
-  Map toMap() {
-    Map map = center.toMap();
-    map["zoom"] = zoom;
-    return map;
-  }
-}
-
-enum MapType { google }
-
-class ToolbarAction {
-  final String title;
-  final int identifier;
-
-  /// Show the button in the toolbar only if there is room.
-  /// DEFAULTS to false
-  /// Only works on Android
-  bool showIfRoom = false;
-
-  ToolbarAction(this.title, this.identifier);
-
-  Map get toMap => {"title": title, "identifier": identifier};
 }

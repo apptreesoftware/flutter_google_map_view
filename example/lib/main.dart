@@ -1,7 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:map_view/camera_position.dart';
+import 'package:map_view/location.dart';
+import 'package:map_view/map_options.dart';
 import 'package:map_view/map_view.dart';
+import 'package:map_view/marker.dart';
+import 'package:map_view/toolbar_action.dart';
 
 void main() {
   MapView.setApiKey("<your_api_key>");
