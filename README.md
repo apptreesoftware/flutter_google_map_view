@@ -4,6 +4,10 @@ A flutter plugin for displaying google maps on iOS and Android
 
 Please note: API changes are likely as we continue to develop this plugin.
 
+
+<img src='https://github.com/apptreesoftware/flutter_google_map_view/raw/master/example/Android_screen.png' width=320/>
+<img src='https://github.com/apptreesoftware/flutter_google_map_view/raw/master/example/iOS_Screen.png' width=320/>
+
 ## Getting Started
 
 ### iOS
