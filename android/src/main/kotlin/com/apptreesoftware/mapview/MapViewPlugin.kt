@@ -3,6 +3,8 @@ package com.apptreesoftware.mapview
 import android.app.Activity
 import android.content.Intent
 import android.location.Location
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import io.flutter.plugin.common.MethodCall
@@ -21,6 +23,8 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         var mapTitle : String = ""
         lateinit var initialCameraPosition: CameraPosition
         var mapActivity: MapActivity? = null
+        val REQUEST_GOOGLE_PLAY_SERVICES = 1000
+
 
         @JvmStatic
         fun registerWith(registrar: Registrar): Unit {
@@ -81,6 +85,10 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         when {
             call.method == "setApiKey" -> result.success(false)
             call.method == "show" -> {
+                val code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity)
+                if (GoogleApiAvailability.getInstance().showErrorDialogFragment(activity, code, REQUEST_GOOGLE_PLAY_SERVICES)) {
+                    return
+                }
                 val mapOptions = call.argument<Map<String, Any>>("mapOptions")
                 val cameraDict = mapOptions["cameraPosition"] as Map<String, Any>
                 initialCameraPosition = getCameraPosition(cameraDict)
