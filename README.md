@@ -27,6 +27,12 @@ Please note: API changes are likely as we continue to develop this plugin.
 2. Also add your Google Maps API Key
     <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="your_api_key"/>
     <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
+3. Add the MapActivity to your AndroidManifest.xml
+    <activity android:name="com.apptreesoftware.mapview.MapActivity" android:theme="@style/Theme.AppCompat.Light.DarkActionBar"/>
+4. In your android/build.gradle file. Under buildScript dependencies add:
+    classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.2-4'
+   
+You can refer to the example project if you run into any issues with these steps.
  ```
 
  

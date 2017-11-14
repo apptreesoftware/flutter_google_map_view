@@ -37,13 +37,26 @@ class _MyAppState extends State<MyApp> {
             title: new Text('Map View Example'),
           ),
           body: new Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              new MaterialButton(
-                onPressed: showMap,
-                child: new Text("Show Map"),
+              new Container(
+                padding: new EdgeInsets.only(top: 10.0),
+                child: new RaisedButton(
+                  color: Colors.blue,
+                  onPressed: showMap,
+                  child: new Text(
+                    "Show Map",
+                    style: new TextStyle(color: Colors.white),
+                  ),
+                ),
               ),
-              new Text(
-                  "Camera Position: ${cameraPosition.center.latitude}, ${cameraPosition.center.longitude}. Zoom: ${cameraPosition.zoom}"),
+              new Center(
+                child: new Container(
+                  padding: new EdgeInsets.only(top: 25.0),
+                  child: new Text(
+                      "Camera Position: ${cameraPosition.center.latitude}, ${cameraPosition.center.longitude}. Zoom: ${cameraPosition.zoom}"),
+                ),
+              ),
             ],
           )),
     );
