@@ -35,6 +35,9 @@ class MapActivity : AppCompatActivity(),
   override fun onMapReady(map: GoogleMap) {
     googleMap = map
 
+    //set mapViewType
+    map.setMapType(MapViewPlugin.mapViewType)
+
     if (MapViewPlugin.showUserLocation) {
       if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
           != PackageManager.PERMISSION_GRANTED) {

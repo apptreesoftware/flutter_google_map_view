@@ -7,17 +7,20 @@ class MapOptions {
   final String title;
   static const CameraPosition _defaultCamera =
       const CameraPosition(const Location(45.5329661, -122.7059508), 12.0);
+  int mapViewType;
 
   MapOptions(
       {this.showUserLocation: false,
       this.initialCameraPosition: _defaultCamera,
-      this.title: ""});
+      this.title: "",
+      this.mapViewType});
 
   Map<String, dynamic> toMap() {
     return {
       "showUserLocation": showUserLocation,
       "cameraPosition": initialCameraPosition.toMap(),
-      "title": title
+      "title": title,
+      "mapViewType" : mapViewType
     };
   }
 }
