@@ -21,6 +21,8 @@ class MapView {
       new StreamController.broadcast();
   StreamController<Null> _mapReadyStreamController =
       new StreamController.broadcast();
+  StreamController<Marker> _infoWindowStreamController =
+      new StreamController.broadcast();
 
   Map<String, Marker> _annotations = {};
 
@@ -113,6 +115,8 @@ class MapView {
 
   Stream<Null> get onMapReady => _mapReadyStreamController.stream;
 
+  Stream<Marker> get onInfoWindowTapped => _infoWindowStreamController.stream;
+
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onMapReady":
@@ -127,6 +131,13 @@ class MapView {
         var annotation = _annotations[id];
         if (annotation != null) {
           _annotationStreamController.add(annotation);
+        }
+        return new Future.value("");
+      case "infoWindowTapped":
+        String id = call.arguments;
+        var annotation = _annotations[id];
+        if (annotation != null) {
+          _infoWindowStreamController.add(annotation);
         }
         return new Future.value("");
       case "mapTapped":

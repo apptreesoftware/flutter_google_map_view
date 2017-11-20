@@ -63,6 +63,9 @@ class MapActivity : AppCompatActivity(),
       val loc = map.myLocation ?: return@setOnMyLocationChangeListener
       MapViewPlugin.locationDidUpdate(loc)
     }
+    map.setOnInfoWindowClickListener{ marker ->
+        MapViewPlugin.infoWindowTapped(marker.tag as String)
+    }
     map.moveCamera(CameraUpdateFactory.newCameraPosition(
         MapViewPlugin.initialCameraPosition))
       MapViewPlugin.onMapReady()
@@ -75,6 +78,7 @@ class MapActivity : AppCompatActivity(),
     }
     return super.onCreateOptionsMenu(menu)
   }
+
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
       MapViewPlugin.handleToolbarAction(item.itemId)
