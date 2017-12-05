@@ -31,6 +31,8 @@
         NSDictionary *mapOptions = args[@"mapOptions"];
         NSDictionary *cameraDict = mapOptions[@"cameraPosition"];
         self.mapTitle = mapOptions[@"title"];
+
+        self.mapViewType = [mapOptions[@"mapViewType"] intValue];
         MapViewController *vc = [[MapViewController alloc] initWithPlugin:self
                                                           navigationItems:[self buttonItemsFromActions:args[@"actions"]]
                                                            cameraPosition:[self cameraPositionFromDict:cameraDict]];
