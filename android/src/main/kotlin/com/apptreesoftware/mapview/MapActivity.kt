@@ -35,7 +35,6 @@ class MapActivity : AppCompatActivity(),
   override fun onMapReady(map: GoogleMap) {
     googleMap = map
 
-    //set mapViewType
     map.setMapType(MapViewPlugin.mapViewType)
 
     if (MapViewPlugin.showUserLocation) {
