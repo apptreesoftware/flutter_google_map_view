@@ -32,7 +32,13 @@
         NSDictionary *cameraDict = mapOptions[@"cameraPosition"];
         self.mapTitle = mapOptions[@"title"];
 
-        self.mapViewType = [mapOptions[@"mapViewType"] intValue];
+        if (mapOptions[@"mapViewType"]  != (id) [NSNull null]) {
+             int mapType = [mapOptions[@"mapViewType"] intValue];
+             if (mapType >= kGMSTypeNormal && mapType <= kGMSTypeNone) {
+                self.mapViewType = mapType;
+             }
+        }
+
         MapViewController *vc = [[MapViewController alloc] initWithPlugin:self
                                                           navigationItems:[self buttonItemsFromActions:args[@"actions"]]
                                                            cameraPosition:[self cameraPositionFromDict:cameraDict]];

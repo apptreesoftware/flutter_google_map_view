@@ -96,7 +96,9 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
                 toolbarActions = getToolbarActions(call.argument<List<Map<String, Any>>>("actions"))
                 showUserLocation = mapOptions["showUserLocation"] as Boolean
                 mapTitle = mapOptions["title"] as String
-                mapViewType = mapOptions["mapViewType"] as Int
+
+                if (mapOptions["mapViewType"] != null) mapViewType = mapOptions["mapViewType"] as Int
+
                 val intent = Intent(activity, MapActivity::class.java)
                 activity.startActivity(intent)
                 result.success(true)
