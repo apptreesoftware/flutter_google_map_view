@@ -16,4 +16,5 @@
 - (void)annotationTapped:(NSString *)identifier;
 - (void)mapTapped:(CLLocationCoordinate2D)coordinate;
 - (void)cameraPositionChanged:(GMSCameraPosition *)position;
+- (int)getMapViewType:(NSString *)mapViewTypeName;
 @end

@@ -104,7 +104,6 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
                 showUserLocation = mapOptions["showUserLocation"] as Boolean
                 mapTitle = mapOptions["title"] as String
 
-
                 if (mapOptions["mapViewType"] != null) {
                     var mappedMapType: Int? = mapTypeMapping.get(mapOptions["mapViewType"]);
                     if (mappedMapType != null) mapViewType = mappedMapType as Int;

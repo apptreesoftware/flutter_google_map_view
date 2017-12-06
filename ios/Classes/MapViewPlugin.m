@@ -33,10 +33,9 @@
         self.mapTitle = mapOptions[@"title"];
 
         if (mapOptions[@"mapViewType"]  != (id) [NSNull null]) {
-             int mapType = [mapOptions[@"mapViewType"] intValue];
-             if (mapType >= kGMSTypeNormal && mapType <= kGMSTypeNone) {
-                self.mapViewType = mapType;
-             }
+             NSString *mapViewTypeName = mapOptions[@"mapViewType"];
+             int mapType = [self getMapViewType:mapViewTypeName];
+             self.mapViewType = mapType;
         }
 
         MapViewController *vc = [[MapViewController alloc] initWithPlugin:self
@@ -163,4 +162,23 @@
     return camera;
 }
 
+- (int)getMapViewType:(NSString *)mapViewTypeName {
+    int mapType = kGMSTypeNormal;
+    if ([@"none" isEqualToString:mapViewTypeName]) {
+        mapType = kGMSTypeNone;
+    }
+    else if ([@"satellite" isEqualToString:mapViewTypeName]) {
+        mapType = kGMSTypeSatellite;
+    }
+    else if ([@"terrain" isEqualToString:mapViewTypeName]) {
+        mapType = kGMSTypeTerrain;
+    }
+    else if ([@"hybrid" isEqualToString:mapViewTypeName]) {
+        mapType = kGMSTypeHybrid;
+    }
+    else if ([@"none" isEqualToString:mapViewTypeName]) {
+        mapType = kGMSTypeNone;
+    }
+    return mapType;
+}
 @end
