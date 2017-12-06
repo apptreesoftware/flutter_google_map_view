@@ -66,7 +66,7 @@ class _MyAppState extends State<MyApp> {
   showMap() {
     mapView.show(
         new MapOptions(
-            mapViewType: MapViewType.MAP_TYPE_SATELLITE,
+            mapViewType: MapViewType.satellite,
             showUserLocation: true,
             initialCameraPosition: new CameraPosition(
                 new Location(45.5235258, -122.6732493), 14.0),
