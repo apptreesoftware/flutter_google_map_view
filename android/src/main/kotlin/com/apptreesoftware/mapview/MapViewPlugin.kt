@@ -16,6 +16,13 @@ import com.google.android.gms.maps.GoogleMap
 
 
 class MapViewPlugin(val activity: Activity) : MethodCallHandler {
+    val mapTypeMapping: HashMap<String, Int> = hashMapOf(
+            "none" to GoogleMap.MAP_TYPE_NONE,
+            "normal" to GoogleMap.MAP_TYPE_NORMAL,
+            "satellite" to GoogleMap.MAP_TYPE_SATELLITE,
+            "terrain" to GoogleMap.MAP_TYPE_TERRAIN,
+            "hybrid" to GoogleMap.MAP_TYPE_HYBRID
+    )
 
     companion object {
         lateinit var channel: MethodChannel
@@ -97,7 +104,11 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
                 showUserLocation = mapOptions["showUserLocation"] as Boolean
                 mapTitle = mapOptions["title"] as String
 
-                if (mapOptions["mapViewType"] != null) mapViewType = mapOptions["mapViewType"] as Int
+
+                if (mapOptions["mapViewType"] != null) {
+                    var mappedMapType: Int? = mapTypeMapping.get(mapOptions["mapViewType"]);
+                    if (mappedMapType != null) mapViewType = mappedMapType as Int;
+                }
 
                 val intent = Intent(activity, MapActivity::class.java)
                 activity.startActivity(intent)
