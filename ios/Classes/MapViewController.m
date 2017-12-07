@@ -190,10 +190,13 @@
     return NO;
 }
 
+- (void)mapView:(GMSMapView *)mapView didTapInfoWindowOfMarker:(GMSMarker *)marker {
+    [self.plugin infoWindowTapped:marker.userData];
+}
+
 - (void)mapView:(GMSMapView *)mapView didTapAtCoordinate:(CLLocationCoordinate2D)coordinate {
     [self.plugin mapTapped:coordinate];
 }
-
 
 - (void)mapView:(GMSMapView *)mapView didChangeCameraPosition:(GMSCameraPosition *)position {
     [self.plugin cameraPositionChanged:position];
