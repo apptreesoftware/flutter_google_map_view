@@ -60,7 +60,8 @@ You can refer to the example project if you run into any issues with these steps
 
 #### Show a map ( with a toolbar )
     mapView.show(
-        new MapOptions(
+            new MapOptions(
+            mapViewType: MapViewType.MAP_TYPE_SATELLITE,
             showUserLocation: true,
             initialCameraPosition: new CameraPosition(
                 new Location(45.5235258, -122.6732493), 14.0),
