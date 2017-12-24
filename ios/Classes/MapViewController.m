@@ -20,6 +20,7 @@
 @property (nonatomic, retain) NSArray *navigationItems;
 @property (nonatomic, retain) GMSCameraPosition *initialCameraPosition;
 @property (nonatomic, retain) NSMutableDictionary *markerIDLookup;
+@property (nonatomic, assign) int mapViewType;
 @end
 
 @implementation MapViewController
@@ -33,6 +34,7 @@
         self.initialCameraPosition = cameraPosition;
         self.markerIDLookup = [NSMutableDictionary dictionary];
         self.title = plugin.mapTitle;
+        self.mapViewType = plugin.mapViewType;
     }
     return self;
 }
@@ -71,6 +73,8 @@
     if (self._locationEnabled) {
         [self monitorLocationChanges];
     }
+
+    self.mapView.mapType = self.mapViewType;
     [self.plugin onMapReady];
 }
 

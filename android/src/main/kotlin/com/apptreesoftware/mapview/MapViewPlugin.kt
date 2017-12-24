@@ -12,9 +12,17 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import com.google.android.gms.maps.GoogleMap
 
 
 class MapViewPlugin(val activity: Activity) : MethodCallHandler {
+    val mapTypeMapping: HashMap<String, Int> = hashMapOf(
+            "none" to GoogleMap.MAP_TYPE_NONE,
+            "normal" to GoogleMap.MAP_TYPE_NORMAL,
+            "satellite" to GoogleMap.MAP_TYPE_SATELLITE,
+            "terrain" to GoogleMap.MAP_TYPE_TERRAIN,
+            "hybrid" to GoogleMap.MAP_TYPE_HYBRID
+    )
 
     companion object {
         lateinit var channel: MethodChannel
@@ -24,7 +32,7 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         lateinit var initialCameraPosition: CameraPosition
         var mapActivity: MapActivity? = null
         val REQUEST_GOOGLE_PLAY_SERVICES = 1000
-
+        var mapViewType: Int = GoogleMap.MAP_TYPE_NORMAL
 
         @JvmStatic
         fun registerWith(registrar: Registrar): Unit {
@@ -95,6 +103,12 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
                 toolbarActions = getToolbarActions(call.argument<List<Map<String, Any>>>("actions"))
                 showUserLocation = mapOptions["showUserLocation"] as Boolean
                 mapTitle = mapOptions["title"] as String
+
+                if (mapOptions["mapViewType"] != null) {
+                    var mappedMapType: Int? = mapTypeMapping.get(mapOptions["mapViewType"]);
+                    if (mappedMapType != null) mapViewType = mappedMapType as Int;
+                }
+
                 val intent = Intent(activity, MapActivity::class.java)
                 activity.startActivity(intent)
                 result.success(true)
