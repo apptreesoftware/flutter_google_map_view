@@ -4,6 +4,64 @@ A flutter plugin for displaying google maps on iOS and Android
 
 Please note: API changes are likely as we continue to develop this plugin.
 
+## Getting Started
+
+### Generate your API Key
+ 
+1. Go to: https://console.developers.google.com/
+2. Enable `Google Maps Android API`
+3. Enable `Google Maps SDK for iOS`
+4. Under `Credentials`, choose `Create Credential`. 
+   - Note: For development, you can create an unrestricted API key that can be used on both iOS & Android. 
+   For production it is highly recommended that you restrict. 
+
+- More detailed instructions for Android can be found here: https://developers.google.com/maps/documentation/android-api/signup
+- More detailed instructions for iOS can be found here: https://developers.google.com/maps/documentation/ios-sdk/get-api-key
+ 
+ The way you register your API key on iOS vs Android is different. Make sure to read the next sections carefully.
+ 
+### iOS
+#### The maps plugin will request your users location when needed. iOS requires that you explain this usage in the Info.plist file
+ 1.  Set the NSLocationWhenInUseUsageDescription in ios/Info.plist. Example:
+```
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Using location to display on a map</string>
+```
+    
+ 2. Prior to using the Map plugin, you must call MapView.setApiKey(String apiKey). Example:
+```
+   void main() {
+     MapView.setApiKey("<your_api_key>");
+     runApp(new MyApp());
+   }
+``` 
+ 
+ ***Note***: If your iOS and Android API key are different, be sure to use your iOS API key here.
+ 
+### Android
+
+1. In your AndroidManifest.xml, add the following uses-permission
+```
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>```
+```
+2. In your AndroidManifest.xml, add the Android Maps API Key you previously generated.
+```
+    <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="your_api_key"/>
+    <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
+```
+3. Add the MapActivity to your AndroidManifest.xml
+```
+    <activity android:name="com.apptreesoftware.mapview.MapActivity" android:theme="@style/Theme.AppCompat.Light.DarkActionBar"/>
+```
+4. In your android/build.gradle file. Under buildScript dependencies add:
+```
+    classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.2-4'
+```
+   
+You can refer to the example project if you run into any issues with these steps.
+
+
 <table>
 <tr><td>
 <img src='https://github.com/apptreesoftware/flutter_google_map_view/raw/master/example/Android_screen.png' width=320/>
@@ -13,27 +71,6 @@ Please note: API changes are likely as we continue to develop this plugin.
 </td>
 </tr>
 </table>
-
-## Getting Started
-
-### iOS
-    1. Set the NSLocationWhenInUseUsageDescription in your Info.plist
-    2. Your Google Map API key must be set using the MapView.setApiKey prior to displaying the MapView
-### Android
-```
-1. In your AndroidManifest.xml, add the following uses-permission
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-2. Also add your Google Maps API Key
-    <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="your_api_key"/>
-    <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
-3. Add the MapActivity to your AndroidManifest.xml
-    <activity android:name="com.apptreesoftware.mapview.MapActivity" android:theme="@style/Theme.AppCompat.Light.DarkActionBar"/>
-4. In your android/build.gradle file. Under buildScript dependencies add:
-    classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.2-4'
-   
-You can refer to the example project if you run into any issues with these steps.
- ```
 
  
 ## Features
