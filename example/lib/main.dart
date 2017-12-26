@@ -1,16 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:map_view/camera_position.dart';
-import 'package:map_view/location.dart';
-import 'package:map_view/map_options.dart';
 import 'package:map_view/map_view.dart';
-import 'package:map_view/marker.dart';
-import 'package:map_view/toolbar_action.dart';
-import 'package:map_view/map_view_type.dart';
+
+///This API Key will be used for both the interactive maps as well as the static maps.
+///Make sure that you have enabled the following APIs in the Google API Console (https://console.developers.google.com/apis)
+/// - Static Maps API
+/// - Android Maps API
+/// - iOS Maps API
+var API_KEY = "<your_api_key>";
 
 void main() {
-  MapView.setApiKey("<your_api_key>");
+  MapView.setApiKey(API_KEY);
   runApp(new MyApp());
 }
 
@@ -23,11 +24,15 @@ class _MyAppState extends State<MyApp> {
   MapView mapView = new MapView();
   CameraPosition cameraPosition;
   var compositeSubscription = new CompositeSubscription();
+  var staticMapProvider = new StaticMapProvider(API_KEY);
+  Uri staticMapUri;
 
   @override
   initState() {
     super.initState();
-    cameraPosition = new CameraPosition(new Location(0.0, 0.0), 0.0);
+    cameraPosition = new CameraPosition(Locations.portland, 12.0);
+    staticMapUri = staticMapProvider.getStaticUri(Locations.portland, 12,
+        width: 900, height: 400);
   }
 
   @override
@@ -41,22 +46,42 @@ class _MyAppState extends State<MyApp> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               new Container(
-                padding: new EdgeInsets.only(top: 10.0),
-                child: new RaisedButton(
-                  color: Colors.blue,
-                  onPressed: showMap,
-                  child: new Text(
-                    "Show Map",
-                    style: new TextStyle(color: Colors.white),
-                  ),
+                height: 250.0,
+                child: new Stack(
+                  children: <Widget>[
+                    new Center(
+                        child: new Container(
+                      child: new Text(
+                        "You are supposed to see a map here.\n\nAPI Key is not valid.\n\n"
+                            "To view maps in the example application set the "
+                            "API_KEY variable in example/lib/main.dart. "
+                            "\n\nIf you have set an API Key but you still see this text "
+                            "make sure you have enabled all of the correct APIs "
+                            "in the Google API Console. See README for more detail.",
+                        textAlign: TextAlign.center,
+                      ),
+                      padding: const EdgeInsets.all(20.0),
+                    )),
+                    new InkWell(
+                      child: new Center(
+                        child: new Image.network(staticMapUri.toString()),
+                      ),
+                      onTap: showMap,
+                    )
+                  ],
                 ),
               ),
-              new Center(
-                child: new Container(
-                  padding: new EdgeInsets.only(top: 25.0),
-                  child: new Text(
-                      "Camera Position: ${cameraPosition.center.latitude}, ${cameraPosition.center.longitude}. Zoom: ${cameraPosition.zoom}"),
+              new Container(
+                padding: new EdgeInsets.only(top: 10.0),
+                child: new Text(
+                  "Tap the map to interact",
+                  style: new TextStyle(fontWeight: FontWeight.bold),
                 ),
+              ),
+              new Container(
+                padding: new EdgeInsets.only(top: 25.0),
+                child: new Text(
+                    "Camera Position: \n\nLat: ${cameraPosition.center.latitude}\n\nLng:${cameraPosition.center.longitude}\n\nZoom: ${cameraPosition.zoom}"),
               ),
             ],
           )),
@@ -66,7 +91,7 @@ class _MyAppState extends State<MyApp> {
   showMap() {
     mapView.show(
         new MapOptions(
-            mapViewType: MapViewType.satellite,
+            mapViewType: MapViewType.normal,
             showUserLocation: true,
             initialCameraPosition: new CameraPosition(
                 new Location(45.5235258, -122.6732493), 14.0),
@@ -116,6 +141,9 @@ class _MyAppState extends State<MyApp> {
     print("Zoom Level: $zoomLevel");
     print("Center: $centerLocation");
     print("Visible Annotation Count: ${visibleAnnotations.length}");
+    var uri = await staticMapProvider.getImageUriFromMap(mapView,
+        width: 900, height: 400);
+    setState(() => staticMapUri = uri);
     mapView.dismiss();
     compositeSubscription.cancel();
   }

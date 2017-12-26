@@ -77,28 +77,52 @@ You will be making multiple edits to your `AndroidManifest.xml` file. In your Fl
 find this file location under `android/app/src/main`
 
 1. In your `AndroidManifest.xml`, add the following uses-permission above the <application> tag.
-```
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-```
+    ```
+        <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+        <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    ```
 2. In your AndroidManifest.xml, add the following lines inside of the `application` tag. Be sure to replace `your_api_key` with the one you generated.
-```
-    <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="your_api_key"/>
-    <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
-```
+    ```
+        <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="your_api_key"/>
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
+    ```
 3. Add the MapActivity to your AndroidManifest.xml
-```
-    <activity android:name="com.apptreesoftware.mapview.MapActivity" android:theme="@style/Theme.AppCompat.Light.DarkActionBar"/>
-```
+    ```
+        <activity android:name="com.apptreesoftware.mapview.MapActivity" android:theme="@style/Theme.AppCompat.Light.DarkActionBar"/>
+    ```
 4. In your `android/build.gradle` file. Under `buildScript` `dependencies` add:
-```
-    classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.2-4'
-```
+    ```
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.2-4'
+    ```
    
 5. Run your application on an Android device or simulator. 
      Confirm that when you display the map you see map detail. 
      If you only see a beige screen it's possible that your API key is incorrect.
 
+
+### Static Maps for Inline display
+
+This plugin does not currently support displaying a Google Map within the
+Flutter widget hierarchy. A common workaround for this is to show a static image using the
+ [Google Static Maps API](https://developers.google.com/maps/documentation/static-maps/).
+Included in this Plugin is the StaticMapProvider class which will allow you to easily generate
+a static map. The Static Maps API also requires an API Key and you must enable the API within the Google API Console.
+
+1. Go to: https://console.developers.google.com/
+2. Enable `Google Static Maps API`
+3. Once enabled, you can use the same API key you generated for iOS/Android.
+4. Initialize the StaticMapProvider
+    ```dart
+    var provider = new StaticMapProvider('your_api_key');
+    ``` 
+5. The StaticMapProvider offers a few different APIs for generating static maps. If you 
+want to generate an image for the current viewport of your full screen interactive map
+you can use:
+```dart
+var uri = staticMapProvider.getImageUriFromMap(mapView,
+                  width: 900, height: 400);
+```
+  
  
 You can refer to the example project if you run into any issues with these steps.
 

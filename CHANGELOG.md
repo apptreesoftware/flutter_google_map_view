@@ -31,3 +31,12 @@
 ## [0.0.5] - 11-14-2017
 
 * Improved setup documentation
+
+## [0.0.6] - 12-26-2017
+
+* Improved README for easier project integration
+* Added StaticMapProvider for generating static map images for inline display
+    * Supports generating an image for center and zoom level
+    * Supports generating an image given a list of markers
+    * Supports generating an image given a current active MapView ( will copy visible annotations, center and zoom to generate static image)
+* MapView now exports all public classes so you only have to import `package:map_view/map_view.dart`

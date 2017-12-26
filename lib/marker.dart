@@ -12,6 +12,7 @@ class Marker {
   Marker(this.id, this.title, this.latitude, this.longitude,
       {this.color: _defaultColor});
 
+
   Map<String, dynamic> toMap() {
     return {
       "id": id,

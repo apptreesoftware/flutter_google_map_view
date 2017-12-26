@@ -1,5 +1,15 @@
 import 'dart:async';
 
+export 'camera_position.dart';
+export 'location.dart';
+export 'marker.dart';
+export 'static_map_provider.dart';
+export 'toolbar_action.dart';
+export 'map_view_type.dart';
+export 'camera_position.dart';
+export 'map_options.dart';
+export 'locations.dart';
+
 import 'package:flutter/services.dart';
 import 'package:map_view/camera_position.dart';
 import 'package:map_view/location.dart';
@@ -51,6 +61,8 @@ class MapView {
   void dismiss() {
     _channel.invokeMethod('dismiss');
   }
+
+  List<Marker> get markers => _annotations.values.toList(growable: false);
 
   void setMarkers(List<Marker> annotations) {
     _annotations.clear();
