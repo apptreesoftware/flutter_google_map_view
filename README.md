@@ -100,7 +100,7 @@ find this file location under `android/app/src/main`
      If you only see a beige screen it's possible that your API key is incorrect.
 
  
-You can refer to the example project if you run into any issues with these steps.
+You can refer to the [example](https://github.com/apptreesoftware/flutter_google_map_view/raw/master/example) project if you run into any issues with these steps.
 
 
 <table>
