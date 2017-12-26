@@ -23,13 +23,13 @@ Please note: API changes are likely as we continue to develop this plugin.
 ### iOS
 #### The maps plugin will request your users location when needed. iOS requires that you explain this usage in the Info.plist file
  1.  Set the NSLocationWhenInUseUsageDescription in `ios/Runner/Info.plist`. Example:
-```
+```xml
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Using location to display on a map</string>
 ```
     
  2. Prior to using the Map plugin, you must call MapView.setApiKey(String apiKey). Example:
-```
+```dart
    import 'package:map_view/map_view.dart';
    
    void main() {
@@ -41,7 +41,7 @@ Please note: API changes are likely as we continue to develop this plugin.
  ***Note***: If your iOS and Android API key are different, be sure to use your iOS API key here.
  
  3. Add code to show the MapView.  
-    ```
+    ```dart
     //Create an instance variable for the mapView
     var _mapView = new MapView();
     
@@ -59,7 +59,7 @@ Please note: API changes are likely as we continue to develop this plugin.
   If you only see a beige screen it's possible that your API key is incorrect. When your API 
   key is incorrect you'll see messages like this in the console:
   
-  ```
+  ```text
   ClientParametersRequest failed, 7 attempts remaining (0 vs 12). Error Domain=com.google.HTTPStatus Code=400 "(null)" UserInfo={data=<>}
   ```
   
@@ -77,21 +77,21 @@ You will be making multiple edits to your `AndroidManifest.xml` file. In your Fl
 find this file location under `android/app/src/main`
 
 1. In your `AndroidManifest.xml`, add the following uses-permission above the <application> tag.
-    ```
+    ```xml
         <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
         <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     ```
 2. In your AndroidManifest.xml, add the following lines inside of the `application` tag. Be sure to replace `your_api_key` with the one you generated.
-    ```
+    ```xml
         <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="your_api_key"/>
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
     ```
 3. Add the MapActivity to your AndroidManifest.xml
-    ```
+    ```xml
         <activity android:name="com.apptreesoftware.mapview.MapActivity" android:theme="@style/Theme.AppCompat.Light.DarkActionBar"/>
     ```
 4. In your `android/build.gradle` file. Under `buildScript` `dependencies` add:
-    ```
+    ```groovy
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.2-4'
     ```
    
