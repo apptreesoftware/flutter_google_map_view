@@ -40,3 +40,5 @@
     * Supports generating an image given a list of markers
     * Supports generating an image given a current active MapView ( will copy visible annotations, center and zoom to generate static image)
 * MapView now exports all public classes so you only have to import `package:map_view/map_view.dart`
+* Added support for info window tap events thanks to [HelenGuov](https://github.com/HelenGuov)
+* Added support for changing map type (normal, satellite, terrain) thanks to [HelenGuov](https://github.com/HelenGuov)
