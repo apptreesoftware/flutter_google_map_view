@@ -87,6 +87,10 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
                 "longitude" to loc.longitude
             ))
         }
+
+        fun infoWindowTapped(id: String) {
+            this.channel.invokeMethod("infoWindowTapped", id)
+        }
     }
 
     override fun onMethodCall(call: MethodCall, result: Result): Unit {

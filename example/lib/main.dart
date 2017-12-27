@@ -132,6 +132,11 @@ class _MyAppState extends State<MyApp> {
       }
     });
     compositeSubscription.add(sub);
+
+    sub = mapView.onInfoWindowTapped.listen((marker) {
+        debugPrint("\nAPP LEVEL - DETECT CLICK INFO WINDOW ${marker.title} \n");
+  });
+      compositeSubscription.add(sub);
   }
 
   _handleDismiss() async {

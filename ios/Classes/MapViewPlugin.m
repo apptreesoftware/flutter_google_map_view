@@ -142,6 +142,10 @@
     [self.channel invokeMethod:@"annotationTapped" arguments:identifier];
 }
 
+- (void)infoWindowTapped:(GMSMarker *)identifier {
+    [self.channel invokeMethod:@"infoWindowTapped" arguments:identifier];
+}
+
 - (void)mapTapped:(CLLocationCoordinate2D)coordinate {
     [self.channel invokeMethod:@"mapTapped" arguments:@{@"latitude": @(coordinate.latitude), @"longitude": @(coordinate.longitude)}];
 }
