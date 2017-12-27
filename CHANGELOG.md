@@ -32,7 +32,7 @@
 
 * Improved setup documentation
 
-## [0.0.6] - 12-26-2017
+## [0.0.6] - 12-27-2017
 
 * Improved README for easier project integration
 * Added StaticMapProvider for generating static map images for inline display
