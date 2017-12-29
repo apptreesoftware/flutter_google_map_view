@@ -45,3 +45,6 @@
 
 ## [0.0.7] - 12-29-2017
 * Fixed dependency problem with uri package.
+
+## [0.0.8] - 12-29-2017
+* Another attempt at fixing dependency problems
