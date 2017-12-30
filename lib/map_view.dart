@@ -81,6 +81,14 @@ class MapView {
     _channel.invokeMethod('addAnnotation', marker.toMap());
   }
 
+  void removeMarker(Marker marker) {
+    if (!_annotations.containsKey(marker.id)) {
+      return;
+    }
+    _annotations.remove(marker.id);
+    _channel.invokeMethod('removeAnnotation', marker.toMap());
+  }
+
   void zoomToFit({int padding: 50}) {
     _channel.invokeMethod('zoomToFit', padding);
   }

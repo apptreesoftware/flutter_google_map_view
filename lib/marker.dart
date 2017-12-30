@@ -12,6 +12,13 @@ class Marker {
   Marker(this.id, this.title, this.latitude, this.longitude,
       {this.color: _defaultColor});
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Marker && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 
   Map<String, dynamic> toMap() {
     return {

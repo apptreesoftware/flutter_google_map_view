@@ -53,6 +53,9 @@
     } else if ([@"addAnnotation" isEqualToString:call.method]) {
         [self handleAddAnnotation:call.arguments];
         result(@YES);
+    } else if ([@"removeAnnotation" isEqualToString:call.method]) {
+        [self handleRemoveAnnotation:call.arguments];
+        result(@YES);
     } else if ([@"setCamera" isEqualToString:call.method]) {
         [self handleSetCamera:call.arguments];
         result(@YES);
@@ -112,6 +115,13 @@
     MapAnnotation *annotation = [MapAnnotation annotationFromDictionary:dict];
     if (annotation) {
         [self.mapViewController addAnnotation:annotation];
+    }
+}
+
+- (void)handleRemoveAnnotation:(NSDictionary *)dict {
+    MapAnnotation *annotation = [MapAnnotation annotationFromDictionary:dict];
+    if (annotation) {
+        [self.mapViewController removeAnnotation:annotation];
     }
 }
 

@@ -99,6 +99,14 @@
     self.markerIDLookup[marker.userData] = marker;
 }
 
+- (void)removeAnnotation:(MapAnnotation *)annotation {
+    GMSMarker *marker = self.markerIDLookup[annotation.identifier];
+    if (marker) {
+        marker.map = nil;
+        self.markerIDLookup[annotation.identifier] = nil;
+    }
+}
+
 - (GMSMarker *)createMarkerForAnnotation:(MapAnnotation *)annotation {
     GMSMarker *marker = [GMSMarker new];
     if ([annotation isKindOfClass:[ClusterAnnotation class]]) {

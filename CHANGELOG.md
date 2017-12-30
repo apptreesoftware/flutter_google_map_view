@@ -48,3 +48,7 @@
 
 ## [0.0.8] - 12-29-2017
 * Another attempt at fixing dependency problems
+
+## [0.0.9] - 12-30-2017
+* Added isEqual check for Marker
+* Add removeMarker

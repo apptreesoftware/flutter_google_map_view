@@ -155,6 +155,9 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
             call.method == "addAnnotation" -> {
                 handleAddAnnotation(call.arguments as Map<String, Any>)
             }
+            call.method == "removeAnnotation" -> {
+                handleRemoveAnnotation(call.arguments as Map<String, Any>)
+            }
             else -> result.notImplemented()
         }
     }
@@ -186,6 +189,12 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
     fun handleAddAnnotation(map: Map<String, Any>) {
         MapAnnotation.fromMap(map)?.let {
             mapActivity?.addMarker(it)
+        }
+    }
+
+    fun handleRemoveAnnotation(map: Map<String, Any>) {
+        MapAnnotation.fromMap(map)?.let {
+            mapActivity?.removeMarker(it)
         }
     }
 }

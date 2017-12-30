@@ -24,9 +24,9 @@
 - (void)updateAnnotations:(NSArray *)annotations;
 
 - (void)addAnnotation:(MapAnnotation *)annotation;
+- (void)removeAnnotation:(MapAnnotation *)annotation;
 
 - (void)zoomTo:(NSArray *)annotations padding:(float)padding;
-
 - (void)zoomToAnnotations:(int)padding;
 
 - (NSArray *)visibleMarkers;

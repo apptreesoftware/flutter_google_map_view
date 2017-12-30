@@ -123,6 +123,13 @@ class MapActivity : AppCompatActivity(),
     markerIdLookup.put(annotation.identifier, marker)
   }
 
+  fun removeMarker(annotation : MapAnnotation) {
+    this.googleMap ?: return
+    val existingMarker = markerIdLookup[annotation.identifier] ?: return
+    markerIdLookup.remove(annotation.identifier)
+    existingMarker.remove()
+  }
+
   val visibleMarkers : List<String> get() {
     val map = this.googleMap ?: return  emptyList()
     val region = map.projection.visibleRegion
