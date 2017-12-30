@@ -61,6 +61,7 @@ class MapView {
   }
 
   void dismiss() {
+    _annotations.clear();
     _channel.invokeMethod('dismiss');
   }
 

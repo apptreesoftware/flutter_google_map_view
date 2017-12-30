@@ -52,3 +52,6 @@
 ## [0.0.9] - 12-30-2017
 * Added isEqual check for Marker
 * Add removeMarker
+
+## [0.0.10] - 12-30-2017
+* Fixed bug where adding annotations would fail after displaying map a second time.
