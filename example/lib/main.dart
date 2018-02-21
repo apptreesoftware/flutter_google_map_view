@@ -27,12 +27,19 @@ class _MyAppState extends State<MyApp> {
   var staticMapProvider = new StaticMapProvider(API_KEY);
   Uri staticMapUri;
 
+  List<Marker> _markers = <Marker>[
+    new Marker("1", "Work", 45.523970, -122.663081, color: Colors.blue),
+    new Marker("2", "Nossa Familia Coffee", 45.528788, -122.684633),
+  ];
+
   @override
   initState() {
     super.initState();
-    cameraPosition = new CameraPosition(Locations.portland, 12.0);
-    staticMapUri = staticMapProvider.getStaticUri(Locations.portland, 12,
-        width: 900, height: 400);
+    cameraPosition = new CameraPosition(Locations.portland, 2.0);
+    staticMapUri = staticMapProvider.getStaticUriWithMarkers(_markers,
+      maptype: StaticMapViewType.satellite, center: new Location(45.523970, -122.663081));
+    //staticMapUri = staticMapProvider.getStaticUri(Locations.portland, 12,
+    //    width: 900, height: 400, mapType: StaticMapViewType.satellite);
   }
 
   @override
@@ -99,10 +106,7 @@ class _MyAppState extends State<MyApp> {
         toolbarActions: [new ToolbarAction("Close", 1)]);
 
     var sub = mapView.onMapReady.listen((_) {
-      mapView.setMarkers(<Marker>[
-        new Marker("1", "Work", 45.523970, -122.663081, color: Colors.blue),
-        new Marker("2", "Nossa Familia Coffee", 45.528788, -122.684633),
-      ]);
+      mapView.setMarkers(_markers);
       mapView.addMarker(new Marker("3", "10 Barrel", 45.5259467, -122.687747,
           color: Colors.purple));
 
