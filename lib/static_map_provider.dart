@@ -33,10 +33,11 @@ class StaticMapProvider {
   /// Specify a [width] and [height] that you would like the resulting image to be. The default is 600w x 400h
   ///
 
-  Uri getStaticUriWithMarkers(List<Marker> markers, {int width, int height, StaticMapViewType maptype
+  Uri getStaticUriWithMarkers(List<Marker> markers, {int width, int height,
+    StaticMapViewType maptype, Location center
   }) {
     return _buildUrl(
-        markers, null, null, width ?? defaultWidth, height ?? defaultHeight, maptype ?? defaultMaptype);
+        markers, center, null, width ?? defaultWidth, height ?? defaultHeight, maptype ?? defaultMaptype);
   }
 
   ///
@@ -91,6 +92,9 @@ class StaticMapProvider {
         'key': googleMapsApiKey,
       };
     }
+    if (center != null)
+      finalUri.queryParameters['center'] = '${center.latitude},${center.longitude}';
+
     var uri = finalUri.build();
     return uri;
   }
