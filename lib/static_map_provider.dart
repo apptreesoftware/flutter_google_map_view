@@ -4,12 +4,14 @@ import 'package:map_view/location.dart';
 import 'package:uri/uri.dart';
 import 'map_view.dart';
 import 'locations.dart';
+import 'map_view_type.dart';
 
 class StaticMapProvider {
   final String googleMapsApiKey;
   static const int defaultZoomLevel = 4;
   static const int defaultWidth = 600;
   static const int defaultHeight = 400;
+  static const StaticMapViewType defaultMaptype =StaticMapViewType.roadmap;
 
   StaticMapProvider(this.googleMapsApiKey);
 
@@ -19,9 +21,10 @@ class StaticMapProvider {
   /// Specify a [width] and [height] that you would like the resulting image to be. The default is 600w x 400h
   ///
 
-  Uri getStaticUri(Location center, int zoomLevel, {int width, int height}) {
+  Uri getStaticUri(Location center, int zoomLevel,
+      {int width, int height, StaticMapViewType mapType}) {
     return _buildUrl(null, center, zoomLevel ?? defaultZoomLevel,
-        width ?? defaultWidth, height ?? defaultHeight);
+        width ?? defaultWidth, height ?? defaultHeight, mapType ?? defaultMaptype);
   }
 
   ///
@@ -30,9 +33,10 @@ class StaticMapProvider {
   /// Specify a [width] and [height] that you would like the resulting image to be. The default is 600w x 400h
   ///
 
-  Uri getStaticUriWithMarkers(List<Marker> markers, {int width, int height}) {
+  Uri getStaticUriWithMarkers(List<Marker> markers, {int width, int height, StaticMapViewType maptype
+  }) {
     return _buildUrl(
-        markers, null, null, width ?? defaultWidth, height ?? defaultHeight);
+        markers, null, null, width ?? defaultWidth, height ?? defaultHeight, maptype ?? defaultMaptype);
   }
 
   ///
@@ -42,16 +46,16 @@ class StaticMapProvider {
   /// Specify a [width] and [height] that you would like the resulting image to be. The default is 600w x 400h
   ///
   Future<Uri> getImageUriFromMap(MapView mapView,
-      {int width, int height}) async {
+      {int width, int height, StaticMapViewType maptype}) async {
     var markers = await mapView.visibleAnnotations;
     var center = await mapView.centerLocation;
     var zoom = await mapView.zoomLevel;
     return _buildUrl(markers, center, zoom.toInt(), width ?? defaultWidth,
-        height ?? defaultHeight);
+        height ?? defaultHeight, maptype ?? defaultMaptype);
   }
 
   Uri _buildUrl(List<Marker> locations, Location center, int zoomLevel,
-      int width, int height) {
+      int width, int height, StaticMapViewType mapType) {
     var finalUri = new UriBuilder()
       ..scheme = 'https'
       ..host = 'maps.googleapis.com'
@@ -68,6 +72,7 @@ class StaticMapProvider {
         'center': '${center.latitude},${center.longitude}',
         'zoom': zoomLevel.toString(),
         'size': '${width ?? defaultWidth}x${height ?? defaultHeight}',
+        'maptype': _getMapTypeQueryParam(mapType),
         'key': googleMapsApiKey,
       };
     } else {
@@ -82,11 +87,32 @@ class StaticMapProvider {
       finalUri.queryParameters = {
         'markers': markersString,
         'size': '${width ?? defaultWidth}x${height ?? defaultHeight}',
+        'maptype': _getMapTypeQueryParam(mapType),
         'key': googleMapsApiKey,
       };
     }
-
     var uri = finalUri.build();
     return uri;
   }
+
+  String _getMapTypeQueryParam(StaticMapViewType maptype) {
+    String mapTypeQueryParam;
+    switch (maptype) {
+      case StaticMapViewType.roadmap:
+        mapTypeQueryParam = "roadmap";
+        break;
+      case StaticMapViewType.satellite:
+        mapTypeQueryParam = "satellite";
+        break;
+      case StaticMapViewType.hybrid:
+        mapTypeQueryParam = "hybrid";
+        break;
+      case StaticMapViewType.terrain:
+        mapTypeQueryParam = "terrain";
+        break;
+    }
+    return mapTypeQueryParam;
+  }
+
+
 }
