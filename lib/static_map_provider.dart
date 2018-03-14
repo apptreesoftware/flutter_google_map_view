@@ -11,7 +11,7 @@ class StaticMapProvider {
   static const int defaultZoomLevel = 4;
   static const int defaultWidth = 600;
   static const int defaultHeight = 400;
-  static const StaticMapViewType defaultMaptype =StaticMapViewType.roadmap;
+  static const StaticMapViewType defaultMaptype = StaticMapViewType.roadmap;
 
   StaticMapProvider(this.googleMapsApiKey);
 
@@ -23,8 +23,13 @@ class StaticMapProvider {
 
   Uri getStaticUri(Location center, int zoomLevel,
       {int width, int height, StaticMapViewType mapType}) {
-    return _buildUrl(null, center, zoomLevel ?? defaultZoomLevel,
-        width ?? defaultWidth, height ?? defaultHeight, mapType ?? defaultMaptype);
+    return _buildUrl(
+        null,
+        center,
+        zoomLevel ?? defaultZoomLevel,
+        width ?? defaultWidth,
+        height ?? defaultHeight,
+        mapType ?? defaultMaptype);
   }
 
   ///
@@ -33,11 +38,10 @@ class StaticMapProvider {
   /// Specify a [width] and [height] that you would like the resulting image to be. The default is 600w x 400h
   ///
 
-  Uri getStaticUriWithMarkers(List<Marker> markers, {int width, int height,
-    StaticMapViewType maptype, Location center
-  }) {
-    return _buildUrl(
-        markers, center, null, width ?? defaultWidth, height ?? defaultHeight, maptype ?? defaultMaptype);
+  Uri getStaticUriWithMarkers(List<Marker> markers,
+      {int width, int height, StaticMapViewType maptype, Location center}) {
+    return _buildUrl(markers, center, null, width ?? defaultWidth,
+        height ?? defaultHeight, maptype ?? defaultMaptype);
   }
 
   ///
@@ -93,7 +97,8 @@ class StaticMapProvider {
       };
     }
     if (center != null)
-      finalUri.queryParameters['center'] = '${center.latitude},${center.longitude}';
+      finalUri.queryParameters['center'] =
+          '${center.latitude},${center.longitude}';
 
     var uri = finalUri.build();
     return uri;
@@ -117,6 +122,4 @@ class StaticMapProvider {
     }
     return mapTypeQueryParam;
   }
-
-
 }
