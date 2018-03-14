@@ -36,10 +36,8 @@ class _MyAppState extends State<MyApp> {
   initState() {
     super.initState();
     cameraPosition = new CameraPosition(Locations.portland, 2.0);
-    staticMapUri = staticMapProvider.getStaticUriWithMarkers(_markers,
-      maptype: StaticMapViewType.satellite, center: new Location(45.523970, -122.663081));
-    //staticMapUri = staticMapProvider.getStaticUri(Locations.portland, 12,
-    //    width: 900, height: 400, mapType: StaticMapViewType.satellite);
+    staticMapUri = staticMapProvider.getStaticUri(Locations.portland, 12,
+      width: 900, height: 400, mapType: StaticMapViewType.satellite);
   }
 
   @override
