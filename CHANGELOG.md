@@ -55,3 +55,8 @@
 
 ## [0.0.10] - 12-30-2017
 * Fixed bug where adding annotations would fail after displaying map a second time.
+
+## [0.0.11] - 04-15-2018
+* Fixed iOS getting current location. Thanks to @nunorpg
+* Added MIT License
+* Added satellite support for static maps thanks to @grepLines 

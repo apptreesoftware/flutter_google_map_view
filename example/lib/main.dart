@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     cameraPosition = new CameraPosition(Locations.portland, 2.0);
     staticMapUri = staticMapProvider.getStaticUri(Locations.portland, 12,
-      width: 900, height: 400, mapType: StaticMapViewType.satellite);
+        width: 900, height: 400, mapType: StaticMapViewType.roadmap);
   }
 
   @override
@@ -107,7 +107,6 @@ class _MyAppState extends State<MyApp> {
       mapView.setMarkers(_markers);
       mapView.addMarker(new Marker("3", "10 Barrel", 45.5259467, -122.687747,
           color: Colors.purple));
-
       mapView.zoomToFit(padding: 100);
     });
     compositeSubscription.add(sub);
