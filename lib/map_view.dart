@@ -33,6 +33,8 @@ class MapView {
       new StreamController.broadcast();
   StreamController<Marker> _infoWindowStreamController =
       new StreamController.broadcast();
+  StreamController<Null> _backPressedStreamController =
+      new StreamController.broadcast();
 
   Map<String, Marker> _annotations = {};
 
@@ -138,6 +140,8 @@ class MapView {
 
   Stream<Marker> get onInfoWindowTapped => _infoWindowStreamController.stream;
 
+  Stream<Null> get onBackPressed => _backPressedStreamController.stream;
+
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onMapReady":
@@ -172,6 +176,9 @@ class MapView {
       case "onToolbarAction":
         _toolbarActionStreamController.add(call.arguments);
         break;
+      case "onBackPressed":
+        _backPressedStreamController.add(null);
+        return new Future.value("");
     }
     return new Future.value("");
   }

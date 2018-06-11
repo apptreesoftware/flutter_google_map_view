@@ -73,6 +73,11 @@ class MapActivity : AppCompatActivity(),
       MapViewPlugin.onMapReady()
   }
 
+  override fun onBackPressed(){
+    MapViewPlugin.onBackButtonTapped()
+    super.onBackPressed()
+  }
+
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
     MapViewPlugin.toolbarActions.forEach {
       val item = menu.add(0, it.identifier, 0, it.title)

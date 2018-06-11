@@ -91,6 +91,10 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         fun infoWindowTapped(id: String) {
             this.channel.invokeMethod("infoWindowTapped", id)
         }
+
+        fun onBackButtonTapped() {
+            this.channel.invokeMethod("backButtonTapped")
+        }
     }
 
     override fun onMethodCall(call: MethodCall, result: Result): Unit {
