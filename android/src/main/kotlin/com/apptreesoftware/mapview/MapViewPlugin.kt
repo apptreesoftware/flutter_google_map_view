@@ -93,7 +93,7 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         }
 
         fun onBackButtonTapped() {
-            this.channel.invokeMethod("backButtonTapped")
+            this.channel.invokeMethod("backButtonTapped", null)
         }
     }
 
