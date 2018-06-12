@@ -176,7 +176,7 @@ class MapView {
       case "onToolbarAction":
         _toolbarActionStreamController.add(call.arguments);
         break;
-      case "onBackPressed":
+      case "backButtonTapped":
         _backPressedStreamController.add(null);
         return new Future.value("");
     }
