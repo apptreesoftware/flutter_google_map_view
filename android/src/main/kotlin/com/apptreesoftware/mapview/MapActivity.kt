@@ -45,7 +45,7 @@ class MapActivity : AppCompatActivity(),
         ActivityCompat.requestPermissions(this, array, PermissionRequest)
       } else {
         map.isMyLocationEnabled = true
-        map.uiSettings.isMyLocationButtonEnabled = false
+        map.uiSettings.isMyLocationButtonEnabled = MapViewPlugin.showUserLocation
         map.uiSettings.isIndoorLevelPickerEnabled = true
       }
     }
