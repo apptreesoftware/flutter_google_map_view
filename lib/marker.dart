@@ -7,10 +7,15 @@ class Marker {
   final double longitude;
   final Color color;
 
-  static const Color _defaultColor = const Color.fromARGB(1, 255, 0, 0);
+  static const Color _defaultColor = const Color(-769226);
 
-  Marker(this.id, this.title, this.latitude, this.longitude,
-      {this.color: _defaultColor});
+  Marker(
+    this.id,
+    this.title,
+    this.latitude,
+    this.longitude, {
+    this.color: _defaultColor,
+  });
 
   @override
   bool operator ==(Object other) =>

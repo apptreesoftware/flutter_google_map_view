@@ -151,12 +151,13 @@ You can refer to the [example](https://github.com/apptreesoftware/flutter_google
 - [X] Receive camera change callbacks
 - [X] Zoom to a set of annotations
 - [X] Customize Pin color
+- [X] Polyline support
+- [X] Polygon support
 
 ### Upcoming
 - [ ] Customize pin image
 - [ ] Remove markers
 - [ ] Bounds geometry functions
-- [ ] Polyline support
 
 ## Usage examples
 
@@ -171,6 +172,7 @@ mapView.show(
             title: "Recently Visited"),
         toolbarActions: [new ToolbarAction("Close", 1)]);
 ```
+
 #### Get notified when the map is ready
 ```dart
 mapView.onMapReady.listen((_) {
@@ -178,7 +180,7 @@ mapView.onMapReady.listen((_) {
 });
 ```
 #### Add multiple pins to the map
-```dart 
+```dart
 mapView.setMarkers(<Marker>[
     new Marker("1", "Work", 45.523970, -122.663081, color: Colors.blue),
     new Marker("2", "Nossa Familia Coffee", 45.528788, -122.684633),
@@ -190,7 +192,98 @@ mapView.setMarkers(<Marker>[
 mapView.addMarker(new Marker("3", "10 Barrel", 45.5259467, -122.687747,
         color: Colors.purple));
 ```
-        
+#### Add multiple polylines to the map
+```dart
+mapView.setPolylines(<Polyline>[
+        new Polyline(
+          "11",
+          <Location>[
+            new Location(45.523970, -122.663081),
+            new Location(45.528788, -122.684633),
+            new Location(45.528864, -122.667195),
+          ],
+          jointType: FigureJointType.round,
+          width: 15.0,
+          color: Colors.orangeAccent,
+        ),
+        new Polyline(
+          "12",
+          <Location>[
+            new Location(45.519698, -122.674932),
+            new Location(45.516687, -122.667014),
+          ],
+          width: 15.0,
+        ),
+      ]);
+```
+
+#### Add a single polyline to the map
+```dart
+mapView.addPolyline(new Polyline(
+          "12",
+          <Location>[
+            new Location(45.519698, -122.674932),
+            new Location(45.516687, -122.667014),
+          ],
+          width: 15.0));
+```
+#### Add multiple polygons to the map
+```dart
+ mapView.setPolygons(<Polygon>[
+        new Polygon(
+            "111",
+            <Location>[
+              new Location(42.9274334, -72.2811234),
+              new Location(42.9258230, -72.2808444),
+              new Location(42.9261294, -72.2779906),
+              new Location(42.9275120, -72.2779155),
+            ],
+            //you can add a hole inside the polygon
+            holes: <Hole>[
+              new Hole(
+                <Location>[
+                  new Location(42.9270721, -72.2797287),
+                  new Location(42.9266400, -72.2796750),
+                  new Location(42.9267186, -72.2790956),
+                  new Location(42.9270014, -72.2790956),
+                ],
+              ),
+            ],
+            jointType: FigureJointType.round,
+            strokeWidth: 5.0,
+            strokeColor: Colors.red,
+            fillColor: Color.fromARGB(75, 255, 0, 0)),
+        new Polygon(
+            "111",
+            <Location>[
+              new Location(45.5231233, -122.6733130),
+              new Location(45.5233225, -122.6732969),
+              new Location(45.5232398, -122.6733506),
+              new Location(45.5231233, -122.6733130),
+            ],
+            jointType: FigureJointType.round,
+            strokeWidth: 5.0,
+            strokeColor: Colors.red,
+            fillColor: Color.fromARGB(75, 255, 0, 0)),
+      ]);
+```
+
+#### Add a single polygon to the map
+```dart
+mapView.addPolygon(new Polygon(
+                                 "111",
+                                 <Location>[
+                                   new Location(45.5231233, -122.6733130),
+                                   new Location(45.5233225, -122.6732969),
+                                   new Location(45.5232398, -122.6733506),
+                                   new Location(45.5231233, -122.6733130),
+                                 ],
+                                 jointType: FigureJointType.round,
+                                 strokeWidth: 5.0,
+                                 strokeColor: Colors.red,
+                                 fillColor: Color.fromARGB(75, 255, 0, 0),
+                                 ));
+```
 #### Zoom to fit all the pins on the map
 ```dart
 mapView.zoomToFit(padding: 100);
@@ -202,9 +295,14 @@ mapView.onLocationUpdated
      .listen((location) => print("Location updated $location"));
 ```
 
-#### Receive marker touches
+#### Receive marker, polyline & polygon touches
 ```dart
-mapView.onTouchAnnotation.listen((marker) => print("marker tapped"));
+//Marker
+mapView.onTouchAnnotation.listen((annotation) => print("annotation ${annotation.id} tapped"));
+//Polyline
+mapView.onTouchPolyline.listen((polyline) => print("polyline ${polyline.id} tapped"));
+//Polygon
+mapView.onTouchPolygon.listen((polygon) => print("polygon ${polygon.id} tapped"));
 ```
 
 #### Receive map touches
