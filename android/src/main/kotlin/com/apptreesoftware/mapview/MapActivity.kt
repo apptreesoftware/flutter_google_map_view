@@ -22,7 +22,6 @@ class MapActivity : AppCompatActivity(),
     var polylineIdLookup = HashMap<String, Polyline>()
     var polygonIdLookup = HashMap<String, Polygon>()
     val PermissionRequest = 1
-    var tapCoordinate: LatLng? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +30,8 @@ class MapActivity : AppCompatActivity(),
         val mapFragment = supportFragmentManager.findFragmentById(
                 R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        if (MapViewPlugin.hideToolbar)
+            this.supportActionBar?.hide()
         MapViewPlugin.mapActivity = this
     }
 
@@ -38,7 +39,7 @@ class MapActivity : AppCompatActivity(),
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         map.setMapType(MapViewPlugin.mapViewType)
-
+        map.uiSettings.isCompassEnabled = MapViewPlugin.showCompassButton
         if (MapViewPlugin.showUserLocation) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
@@ -47,8 +48,7 @@ class MapActivity : AppCompatActivity(),
                 ActivityCompat.requestPermissions(this, array, PermissionRequest)
             } else {
                 map.isMyLocationEnabled = true
-                map.uiSettings.isMyLocationButtonEnabled = true
-                map.uiSettings.isIndoorLevelPickerEnabled = true
+                map.uiSettings.isMyLocationButtonEnabled = MapViewPlugin.showMyLocationButton
             }
         }
 

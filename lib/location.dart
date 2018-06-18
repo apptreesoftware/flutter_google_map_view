@@ -3,16 +3,19 @@ class Location {
   final double longitude;
   /// Time in milliseconds
   final int time;
-  /// Altitude in meters
+  /// Altitude in meters.
   ///
-  /// The altitude means meters above the WGS 84 reference ellipsoid.
+  /// Read platform specification for this value.
   final double altitude;
   /// Speed in meters per second
   final double speed;
   /// Horizontal accuracy in meters
+  ///
+  /// Read platform specification for this value.
   final double horizontalAccuracy;
   /// Vertical accuracy in meters.
   ///
+  /// Read platform specification for this value.
   /// In Android is required API 26 onwards.
   final double verticalAccuracy;
 

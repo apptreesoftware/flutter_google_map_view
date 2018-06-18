@@ -5,19 +5,19 @@ import 'package:map_view/map_view_type.dart';
 class MapOptions {
   /// Allows the app to receive location updates.
   final bool showUserLocation;
-  /// Hide/show the button to center the map on the user location.
+  /// show/hide the button to center the map on the user location.
   ///
   /// Requires showUserLocation to be true.
   final bool showMyLocationButton;
-  /// Hide/show the compass button on the map.
+  /// show/hide the compass button on the map.
   ///
   /// Normally is not visible all the time. Becomes visible when the orientation
   /// of the map is changes through gesture.
   final bool showCompassButton;
-  /// Hide/show the toolbar while on the map activity/view.
+  /// show/hide the toolbar while on the map activity/view.
   ///
-  /// The actions passed to the function show of the MapView will not work
-  /// because will not be visible.
+  /// Actions passed to the MapView.show(MapOptions,<ToolbarAction>[]) function will not work
+  /// because they will not be visible.
   final bool hideToolbar;
   final CameraPosition initialCameraPosition;
   final String title;

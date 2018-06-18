@@ -14,7 +14,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
 /*
-Everytime i reformated the code, this imports were removed so i put them here
+Every time i reformatted the code, this imports were removed so i put them here
 for easier access.
 
 import io.flutter.plugin.common.MethodCall
@@ -36,6 +36,9 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         lateinit var channel: MethodChannel
         var toolbarActions: List<ToolbarAction> = emptyList()
         var showUserLocation: Boolean = false
+        var showMyLocationButton: Boolean = false
+        var showCompassButton: Boolean = false
+        var hideToolbar: Boolean = false
         var mapTitle: String = ""
         lateinit var initialCameraPosition: CameraPosition
         var mapActivity: MapActivity? = null
@@ -100,7 +103,7 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         fun locationDidUpdate(loc: Location) {
             var verticalAccuracy = 0.0f
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                verticalAccuracy= loc.verticalAccuracyMeters
+                verticalAccuracy = loc.verticalAccuracyMeters
             this.channel.invokeMethod("locationUpdated", mapOf(
                     "latitude" to loc.latitude,
                     "longitude" to loc.longitude,
@@ -130,6 +133,9 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
                 initialCameraPosition = getCameraPosition(cameraDict)
                 toolbarActions = getToolbarActions(call.argument<List<Map<String, Any>>>("actions"))
                 showUserLocation = mapOptions["showUserLocation"] as Boolean
+                showMyLocationButton = mapOptions["showMyLocationButton"] as Boolean
+                showCompassButton = mapOptions["showCompassButton"] as Boolean
+                hideToolbar = mapOptions["hideToolbar"] as Boolean
                 mapTitle = mapOptions["title"] as String
 
                 if (mapOptions["mapViewType"] != null) {
