@@ -3,8 +3,8 @@ package com.apptreesoftware.mapview
 import android.app.Activity
 import android.content.Intent
 import android.location.Location
-import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import io.flutter.plugin.common.MethodCall
@@ -12,9 +12,16 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
-import com.google.android.gms.maps.GoogleMap
+/*
+Everytime i reformated the code, this imports were removed so i put them here
+for easier access.
 
-
+import io.flutter.plugin.common.MethodCall
+import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.plugin.common.PluginRegistry.Registrar
+ */
 class MapViewPlugin(val activity: Activity) : MethodCallHandler {
     val mapTypeMapping: HashMap<String, Int> = hashMapOf(
             "none" to GoogleMap.MAP_TYPE_NONE,
@@ -28,7 +35,7 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         lateinit var channel: MethodChannel
         var toolbarActions: List<ToolbarAction> = emptyList()
         var showUserLocation: Boolean = false
-        var mapTitle : String = ""
+        var mapTitle: String = ""
         lateinit var initialCameraPosition: CameraPosition
         var mapActivity: MapActivity? = null
         val REQUEST_GOOGLE_PLAY_SERVICES = 1000
@@ -65,26 +72,34 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
 
         fun mapTapped(latLng: LatLng) {
             this.channel.invokeMethod("mapTapped",
-                                      mapOf("latitude" to latLng.latitude,
-                                            "longitude" to latLng.longitude))
+                    mapOf("latitude" to latLng.latitude,
+                            "longitude" to latLng.longitude))
         }
 
         fun annotationTapped(id: String) {
             this.channel.invokeMethod("annotationTapped", id)
         }
 
+        fun polylineTapped(id: String) {
+            this.channel.invokeMethod("polylineTapped", id)
+        }
+
+        fun polygonTapped(id: String) {
+            this.channel.invokeMethod("polygonTapped", id)
+        }
+
         fun cameraPositionChanged(pos: CameraPosition) {
             this.channel.invokeMethod("cameraPositionChanged", mapOf(
-                "latitude" to pos.target.latitude,
-                "longitude" to pos.target.longitude,
-                "zoom" to pos.zoom
+                    "latitude" to pos.target.latitude,
+                    "longitude" to pos.target.longitude,
+                    "zoom" to pos.zoom
             ))
         }
 
         fun locationDidUpdate(loc: Location) {
             this.channel.invokeMethod("locationUpdated", mapOf(
-                "latitude" to loc.latitude,
-                "longitude" to loc.longitude
+                    "latitude" to loc.latitude,
+                    "longitude" to loc.longitude
             ))
         }
 
@@ -130,7 +145,7 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
             call.method == "getCenter" -> {
                 val center = mapActivity?.target ?: LatLng(0.0, 0.0)
                 result.success(mapOf("latitude" to center.latitude,
-                                     "longitude" to center.longitude))
+                        "longitude" to center.longitude))
             }
             call.method == "setCamera" -> {
                 handleSetCamera(call.arguments as Map<String, Any>)
@@ -140,13 +155,25 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
                 handleZoomToAnnotations(call.arguments as Map<String, Any>)
                 result.success(true)
             }
+            call.method == "zoomToPolylines" -> {
+                handleZoomToPolylines(call.arguments as Map<String, Any>)
+                result.success(true)
+            }
+            call.method == "zoomToPolygons" -> {
+                handleZoomToPolygons(call.arguments as Map<String, Any>)
+                result.success(true)
+            }
             call.method == "zoomToFit" -> {
-                mapActivity?.zoomToAnnotations(call.arguments as Int)
+                mapActivity?.zoomToFit(call.arguments as Int)
                 result.success(true)
             }
             call.method == "getVisibleMarkers" -> {
                 val visibleMarkerIds = mapActivity?.visibleMarkers ?: emptyList()
                 result.success(visibleMarkerIds)
+            }
+            call.method == "clearAnnotations" -> {
+                mapActivity?.clearMarkers()
+                result.success(true)
             }
             call.method == "setAnnotations" -> {
                 handleSetAnnotations(call.arguments as List<Map<String, Any>>)
@@ -157,6 +184,42 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
             }
             call.method == "removeAnnotation" -> {
                 handleRemoveAnnotation(call.arguments as Map<String, Any>)
+            }
+            call.method == "getVisiblePolylines" -> {
+                val visiblePolylineIds = mapActivity?.visiblePolyline ?: emptyList()
+                result.success(visiblePolylineIds)
+            }
+            call.method == "clearPolylines" -> {
+                mapActivity?.clearPolylines()
+                result.success(true)
+            }
+            call.method == "setPolylines" -> {
+                handleSetPolylines(call.arguments as List<Map<String, Any>>)
+                result.success(true)
+            }
+            call.method == "addPolyline" -> {
+                handleAddPolyline(call.arguments as Map<String, Any>)
+            }
+            call.method == "removePolyline" -> {
+                handleRemovePolyline(call.arguments as Map<String, Any>)
+            }
+            call.method == "getVisiblePolygons" -> {
+                val visiblePolygonIds = mapActivity?.visiblePolygon ?: emptyList()
+                result.success(visiblePolygonIds)
+            }
+            call.method == "clearPolygons" -> {
+                mapActivity?.clearPolygons()
+                result.success(true)
+            }
+            call.method == "setPolygons" -> {
+                handleSetPolygons(call.arguments as List<Map<String, Any>>)
+                result.success(true)
+            }
+            call.method == "addPolygon" -> {
+                handleAddPolygon(call.arguments as Map<String, Any>)
+            }
+            call.method == "removePolygon" -> {
+                handleRemovePolygon(call.arguments as Map<String, Any>)
             }
             else -> result.notImplemented()
         }
@@ -172,7 +235,19 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
     fun handleZoomToAnnotations(map: Map<String, Any>) {
         val ids = map["annotations"] as List<String>
         val padding = map["padding"] as Double
-        mapActivity?.zoomTo(annoationIds = ids, padding = padding.toFloat())
+        mapActivity?.zoomToAnnotations(ids, padding.toFloat())
+    }
+
+    fun handleZoomToPolylines(map: Map<String, Any>) {
+        val ids = map["polylines"] as List<String>
+        val padding = map["padding"] as Double
+        mapActivity?.zoomToPolylines(ids, padding.toFloat())
+    }
+
+    fun handleZoomToPolygons(map: Map<String, Any>) {
+        val ids = map["polygons"] as List<String>
+        val padding = map["padding"] as Double
+        mapActivity?.zoomToPolygons(ids, padding.toFloat())
     }
 
     fun handleSetAnnotations(annotations: List<Map<String, Any>>) {
@@ -195,6 +270,52 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
     fun handleRemoveAnnotation(map: Map<String, Any>) {
         MapAnnotation.fromMap(map)?.let {
             mapActivity?.removeMarker(it)
+        }
+    }
+
+    fun handleSetPolylines(polylines: List<Map<String, Any>>) {
+        val mapPolylines = ArrayList<MapPolyline>()
+        for (a in polylines) {
+            val mapPolyline = MapPolyline.fromMap(a)
+            if (mapPolyline != null) {
+                mapPolylines.add(mapPolyline)
+            }
+        }
+        mapActivity?.setPolylines(mapPolylines)
+    }
+
+    fun handleAddPolyline(map: Map<String, Any>) {
+        MapPolyline.fromMap(map)?.let {
+            mapActivity?.addPolyline(it)
+        }
+    }
+
+    fun handleRemovePolyline(map: Map<String, Any>) {
+        MapPolyline.fromMap(map)?.let {
+            mapActivity?.removePolyline(it)
+        }
+    }
+
+    fun handleSetPolygons(polygons: List<Map<String, Any>>) {
+        val mapPolygons = ArrayList<MapPolygon>()
+        for (a in polygons) {
+            val mapPolygon = MapPolygon.fromMap(a)
+            if (mapPolygon != null) {
+                mapPolygons.add(mapPolygon)
+            }
+        }
+        mapActivity?.setPolygons(mapPolygons)
+    }
+
+    fun handleAddPolygon(map: Map<String, Any>) {
+        MapPolygon.fromMap(map)?.let {
+            mapActivity?.addPolygon(it)
+        }
+    }
+
+    fun handleRemovePolygon(map: Map<String, Any>) {
+        MapPolygon.fromMap(map)?.let {
+            mapActivity?.removePolygon(it)
         }
     }
 }

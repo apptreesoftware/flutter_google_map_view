@@ -1,6 +1,8 @@
 #import "MapViewPlugin.h"
 #import "MapViewController.h"
 #import "MapAnnotation.h"
+#import "MapPolyline.h"
+#import "MapPolygon.h"
 #import <GoogleMaps/GoogleMaps.h>
 
 @implementation MapViewPlugin
@@ -47,14 +49,47 @@
         self.mapViewController = vc;
         [self.mapViewController setLocationEnabled:[mapOptions[@"showUserLocation"] boolValue]];
         result(@YES);
+    } else if ([@"getVisibleMarkers" isEqualToString:call.method]) {
+        result(self.mapViewController.visibleMarkers);
     } else if ([@"setAnnotations" isEqualToString:call.method]) {
         [self handleSetAnnotations:call.arguments];
+        result(@YES);
+    } else if ([@"clearAnnotations" isEqualToString:call.method]) {
+        [self.mapViewController clearAnnotations];
         result(@YES);
     } else if ([@"addAnnotation" isEqualToString:call.method]) {
         [self handleAddAnnotation:call.arguments];
         result(@YES);
     } else if ([@"removeAnnotation" isEqualToString:call.method]) {
         [self handleRemoveAnnotation:call.arguments];
+        result(@YES);
+    } else if ([@"getVisiblePolylines" isEqualToString:call.method]) {
+        result(self.mapViewController.visiblePolylines);
+    } else if ([@"clearPolylines" isEqualToString:call.method]) {
+        [self.mapViewController clearPolylines];
+        result(@YES);
+    } else if ([@"setPolylines" isEqualToString:call.method]) {
+        [self handleSetPolylines:call.arguments];
+        result(@YES);
+    } else if ([@"addPolyline" isEqualToString:call.method]) {
+        [self handleAddPolyline:call.arguments];
+        result(@YES);
+    } else if ([@"removePolyline" isEqualToString:call.method]) {
+        [self handleRemovePolyline:call.arguments];
+        result(@YES);
+    } else if ([@"getVisiblePolygons" isEqualToString:call.method]) {
+        result(self.mapViewController.visiblePolygons);
+    } else if ([@"clearPolygons" isEqualToString:call.method]) {
+        [self.mapViewController clearPolygons];
+        result(@YES);
+    } else if ([@"setPolygons" isEqualToString:call.method]) {
+        [self handleSetPolygons:call.arguments];
+        result(@YES);
+    } else if ([@"addPolygon" isEqualToString:call.method]) {
+        [self handleAddPolygon:call.arguments];
+        result(@YES);
+    } else if ([@"removePolygon" isEqualToString:call.method]) {
+        [self handleRemovePolygon:call.arguments];
         result(@YES);
     } else if ([@"setCamera" isEqualToString:call.method]) {
         [self handleSetCamera:call.arguments];
@@ -70,8 +105,6 @@
         result(@{@"latitude": @(location.latitude), @"longitude": @(location.longitude)});
     } else if ([@"getZoomLevel" isEqualToString:call.method]) {
         result(@(self.mapViewController.zoomLevel));
-    } else if ([@"getVisibleMarkers" isEqualToString:call.method]) {
-        result(self.mapViewController.visibleMarkers);
     } else if ([@"dismiss" isEqualToString:call.method]) {
         if (self.mapViewController) {
             [self.host dismissViewControllerAnimated:true completion:nil];
@@ -124,7 +157,54 @@
         [self.mapViewController removeAnnotation:annotation];
     }
 }
+- (void)handleSetPolylines:(NSArray *)polylines {
+    NSMutableArray *array = [NSMutableArray array];
+    for (NSDictionary *aDict in polylines) {
+        MapPolyline *polyline=[MapPolyline polylineFromDictionary:aDict];
+        if (polyline) {
+            [array addObject:polyline];
+        }
+    }
+    [self.mapViewController updatePolylines:array];
+}
 
+- (void)handleAddPolyline:(NSDictionary *)dict {
+    MapPolyline *polyline = [MapPolyline polylineFromDictionary:dict];
+    if (polyline) {
+        [self.mapViewController addPolyline:polyline];
+    }
+}
+
+- (void)handleRemovePolyline:(NSDictionary *)dict {
+    MapPolyline *polyline = [MapPolyline polylineFromDictionary:dict];
+    if (polyline) {
+        [self.mapViewController removePolyline:polyline];
+    }
+}
+- (void)handleSetPolygons:(NSArray *)polygons {
+    NSMutableArray *array = [NSMutableArray array];
+    for (NSDictionary *aDict in polygons) {
+        MapPolygon *polygon=[MapPolygon polygonFromDictionary:aDict];
+        if (polygon) {
+            [array addObject:polygon];
+        }
+    }
+    [self.mapViewController updatePolygons:array];
+}
+
+- (void)handleAddPolygon:(NSDictionary *)dict {
+    MapPolygon *polygon = [MapPolygon polygonFromDictionary:dict];
+    if (polygon) {
+        [self.mapViewController addPolygon:polygon];
+    }
+}
+
+- (void)handleRemovePolygon:(NSDictionary *)dict {
+    MapPolygon *polygon = [MapPolygon polygonFromDictionary:dict];
+    if (polygon) {
+        [self.mapViewController removePolygon:polygon];
+    }
+}
 - (void)handleZoomToAnnotations:(NSDictionary *)zoomToDict {
     NSArray *annotations = zoomToDict[@"annotations"];
     float padding = [zoomToDict[@"padding"] floatValue];
@@ -151,7 +231,12 @@
 - (void)annotationTapped:(NSString *)identifier {
     [self.channel invokeMethod:@"annotationTapped" arguments:identifier];
 }
-
+- (void)polylineTapped:(NSString *)identifier {
+    [self.channel invokeMethod:@"polylineTapped" arguments:identifier];
+}
+- (void)polygonTapped:(NSString *)identifier {
+    [self.channel invokeMethod:@"polygonTapped" arguments:identifier];
+}
 - (void)infoWindowTapped:(GMSMarker *)identifier {
     [self.channel invokeMethod:@"infoWindowTapped" arguments:identifier];
 }

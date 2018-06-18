@@ -14,6 +14,8 @@
 - (void)onMapReady;
 - (void)locationDidUpdate:(CLLocation *)location;
 - (void)annotationTapped:(NSString *)identifier;
+- (void)polylineTapped:(NSString *)identifier;
+- (void)polygonTapped:(NSString *)identifier;
 - (void)infoWindowTapped:(NSString *)identifier; 
 - (void)mapTapped:(CLLocationCoordinate2D)coordinate;
 - (void)cameraPositionChanged:(GMSCameraPosition *)position;

@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'map_view'
-  s.version          = '0.0.1'
+  s.version          = '0.0.12'
   s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
 A new flutter plugin project.
