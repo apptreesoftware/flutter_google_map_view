@@ -45,7 +45,9 @@
 - (NSArray *)visiblePolylines;
 - (NSArray *)visiblePolygons;
 
-- (void)setLocationEnabled:(BOOL) enabled;
+- (void)setMapOptions:(BOOL)myLocationEnabled
+       locationButton:(BOOL)myLocationButton
+        compassButton:(BOOL)compassButton;
 
 @property (readonly) float zoomLevel;
 @property (readonly) CLLocationCoordinate2D centerLocation;

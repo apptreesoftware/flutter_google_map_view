@@ -64,6 +64,7 @@ class MapView {
     if (toolbarActions != null) {
       actions = toolbarActions.map((t) => t.toMap).toList();
     }
+    print(mapOptions.toMap());
     _channel.invokeMethod(
         'show', {"mapOptions": mapOptions.toMap(), "actions": actions});
   }

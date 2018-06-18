@@ -20,6 +20,8 @@
 @property (nonatomic, retain) NSMutableArray *polylines;
 @property (nonatomic, retain) NSMutableArray *polygons;
 @property (nonatomic) BOOL _locationEnabled;
+@property (nonatomic) BOOL _locationButton;
+@property (nonatomic) BOOL _compassButton;
 @property (nonatomic) BOOL observingLocation;
 @property (nonatomic, assign) MapViewPlugin *plugin;
 @property (nonatomic, retain) NSArray *navigationItems;
@@ -60,29 +62,33 @@
     self.navigationItem.rightBarButtonItems = self.navigationItems;
 }
 
-- (void)setLocationEnabled:(BOOL)enabled {
-    self._locationEnabled = enabled;
+- (void)setMapOptions:(BOOL)myLocationEnabled
+       locationButton:(BOOL)myLocationButton
+        compassButton:(BOOL)compassButton{
+    self._locationEnabled = myLocationEnabled;
+    self._locationButton = myLocationButton;
+    self._compassButton = compassButton;
+}
+
+- (void) loadMapOptions{
     if (self.mapView) {
-        self.mapView.myLocationEnabled = enabled;
-        self.mapView.settings.myLocationButton = enabled;
-        if (enabled) {
+        self.mapView.settings.compassButton = self._compassButton;
+        if (self._locationEnabled) {
+            self.mapView.myLocationEnabled = YES;
+            self.mapView.settings.myLocationButton = self._locationButton;
             [self monitorLocationChanges];
         } else {
             [self stopMonitoringLocationChanges];
         }
     }
 }
-
 - (void)loadView {
     self.mapView = [GMSMapView mapWithFrame:CGRectZero camera:self.initialCameraPosition];
     self.view = self.mapView;
 
     // Creates a marker in the center of the map.
     self.mapView.delegate = self;
-    self.mapView.myLocationEnabled = self._locationEnabled;
-    if (self._locationEnabled) {
-        [self monitorLocationChanges];
-    }
+    [self loadMapOptions];
 
     self.mapView.mapType = self.mapViewType;
     [self.plugin onMapReady];

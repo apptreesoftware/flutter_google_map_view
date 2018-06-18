@@ -44,10 +44,11 @@
                                                           navigationItems:[self buttonItemsFromActions:args[@"actions"]]
                                                            cameraPosition:[self cameraPositionFromDict:cameraDict]];
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
+        navController.navigationBar.hidden = [mapOptions[@"hideToolbar"] boolValue];
         navController.navigationBar.translucent = NO;
         [self.host presentViewController:navController animated:true completion:nil];
         self.mapViewController = vc;
-        [self.mapViewController setLocationEnabled:[mapOptions[@"showUserLocation"] boolValue]];
+        [self.mapViewController setMapOptions:[mapOptions[@"showUserLocation"] boolValue] locationButton:[mapOptions[@"showMyLocationButton"] boolValue] compassButton:[mapOptions[@"showCompassButton"] boolValue]];
         result(@YES);
     } else if ([@"getVisibleMarkers" isEqualToString:call.method]) {
         result(self.mapViewController.visibleMarkers);
@@ -225,7 +226,16 @@
 }
 
 - (void)locationDidUpdate:(CLLocation *)location {
-    [self.channel invokeMethod:@"locationUpdated" arguments:@{@"latitude": @(location.coordinate.latitude), @"longitude": @(location.coordinate.longitude)}];
+    NSInteger time = location.timestamp.timeIntervalSince1970;
+    time *= 1000;
+    [self.channel invokeMethod:@"locationUpdated" arguments:@{@"latitude": @(location.coordinate.latitude),
+                                                              @"longitude": @(location.coordinate.longitude),
+                                                              @"time":@(time),
+                                                              @"altitude":@(location.altitude),
+                                                              @"speed":@(location.speed),
+                                                              @"horizontalAccuracy":@(location.horizontalAccuracy),
+                                                              @"verticalAccuracy":@(location.verticalAccuracy)
+                                                              }];
 }
 
 - (void)annotationTapped:(NSString *)identifier {

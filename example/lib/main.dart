@@ -181,6 +181,9 @@ class _MyAppState extends State<MyApp> {
         new MapOptions(
             mapViewType: MapViewType.normal,
             showUserLocation: true,
+            showMyLocationButton: true,
+            showCompassButton: true,
+            hideToolbar: false,
             title: "Recently Visited"),
         toolbarActions: [new ToolbarAction("Close", 1)]);
     StreamSubscription sub = mapView.onMapReady.listen((_) {
