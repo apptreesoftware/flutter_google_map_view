@@ -252,7 +252,7 @@ class MapView {
         return new Future.value("");
       case "locationUpdated":
         Map args = call.arguments;
-        _locationChangeStreamController.add(new Location.fromMap(args));
+        _locationChangeStreamController.add(new Location.fromMapFull(args));
         return new Future.value("");
       case "annotationTapped":
         String id = call.arguments;

@@ -3,6 +3,7 @@ package com.apptreesoftware.mapview
 import android.app.Activity
 import android.content.Intent
 import android.location.Location
+import android.os.Build
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.CameraPosition
@@ -97,9 +98,17 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         }
 
         fun locationDidUpdate(loc: Location) {
+            var verticalAccuracy = 0.0f
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                verticalAccuracy= loc.verticalAccuracyMeters
             this.channel.invokeMethod("locationUpdated", mapOf(
                     "latitude" to loc.latitude,
-                    "longitude" to loc.longitude
+                    "longitude" to loc.longitude,
+                    "time" to loc.time,
+                    "altitude" to loc.altitude,
+                    "speed" to loc.speed,
+                    "horizontalAccuracy" to loc.accuracy,
+                    "verticalAccuracy" to verticalAccuracy
             ))
         }
 
