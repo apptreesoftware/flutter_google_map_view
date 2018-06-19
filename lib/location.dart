@@ -7,7 +7,15 @@ class Location {
     return new Location(map["latitude"], map["longitude"]);
   }
 
-  Map toMap() {
+  static List<Map<String, dynamic>> listToMap(List<Location> list) {
+    List<Map<String, dynamic>> result = [];
+    for (var element in list) {
+      result.add(element.toMap());
+    }
+    return result;
+  }
+
+  Map<String, dynamic> toMap() {
     return {"latitude": this.latitude, "longitude": this.longitude};
   }
 

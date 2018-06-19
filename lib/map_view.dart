@@ -1,25 +1,31 @@
 import 'dart:async';
 
-export 'camera_position.dart';
-export 'location.dart';
-export 'marker.dart';
-export 'static_map_provider.dart';
-export 'toolbar_action.dart';
-export 'map_view_type.dart';
-export 'camera_position.dart';
-export 'map_options.dart';
-export 'locations.dart';
-
 import 'package:flutter/services.dart';
 import 'package:map_view/camera_position.dart';
 import 'package:map_view/location.dart';
 import 'package:map_view/map_options.dart';
 import 'package:map_view/marker.dart';
+import 'package:map_view/polygon.dart';
+import 'package:map_view/polyline.dart';
 import 'package:map_view/toolbar_action.dart';
+
+export 'camera_position.dart';
+export 'camera_position.dart';
+export 'location.dart';
+export 'locations.dart';
+export 'map_options.dart';
+export 'map_view_type.dart';
+export 'marker.dart';
+export 'static_map_provider.dart';
+export 'toolbar_action.dart';
 
 class MapView {
   MethodChannel _channel = const MethodChannel("com.apptreesoftware.map_view");
   StreamController<Marker> _annotationStreamController =
+      new StreamController.broadcast();
+  StreamController<Polyline> _polylineStreamController =
+      new StreamController.broadcast();
+  StreamController<Polygon> _polygonStreamController =
       new StreamController.broadcast();
   StreamController<Location> _locationChangeStreamController =
       new StreamController.broadcast();
@@ -37,6 +43,8 @@ class MapView {
       new StreamController.broadcast();
 
   Map<String, Marker> _annotations = {};
+  Map<String, Polyline> _polylines = {};
+  Map<String, Polygon> _polygons = {};
 
   MapView() {
     _channel.setMethodCallHandler(_handleMethod);
@@ -64,16 +72,26 @@ class MapView {
 
   void dismiss() {
     _annotations.clear();
+    _polylines.clear();
+    _polygons.clear();
     _channel.invokeMethod('dismiss');
   }
 
   List<Marker> get markers => _annotations.values.toList(growable: false);
+
+  List<Polyline> get polylines => _polylines.values.toList(growable: false);
+
+  List<Polygon> get polygons => _polygons.values.toList(growable: false);
 
   void setMarkers(List<Marker> annotations) {
     _annotations.clear();
     annotations.forEach((a) => _annotations[a.id] = a);
     _channel.invokeMethod('setAnnotations',
         annotations.map((a) => a.toMap()).toList(growable: false));
+  }
+
+  void clearAnnotations() {
+    _channel.invokeMethod('clearAnnotations');
   }
 
   void addMarker(Marker marker) {
@@ -92,13 +110,77 @@ class MapView {
     _channel.invokeMethod('removeAnnotation', marker.toMap());
   }
 
+  void setPolylines(List<Polyline> polylines) {
+    _polylines.clear();
+    polylines.forEach((a) => _polylines[a.id] = a);
+    _channel.invokeMethod('setPolylines',
+        polylines.map((a) => a.toMap()).toList(growable: false));
+  }
+
+  void clearPolylines() {
+    _channel.invokeMethod('clearPolylines');
+  }
+
+  void addPolyline(Polyline polyline) {
+    if (_polylines.containsKey(polyline.id)) {
+      return;
+    }
+    _polylines[polyline.id] = polyline;
+    _channel.invokeMethod('addPolyline', polyline.toMap());
+  }
+
+  void removePolyline(Polyline polyline) {
+    if (!_polylines.containsKey(polyline.id)) {
+      return;
+    }
+    _polylines.remove(polyline.id);
+    _channel.invokeMethod('removePolyline', polyline.toMap());
+  }
+
+  void setPolygons(List<Polygon> polygons) {
+    _polygons.clear();
+    polygons.forEach((a) => _polygons[a.id] = a);
+    _channel.invokeMethod(
+        'setPolygons', polygons.map((a) => a.toMap()).toList(growable: false));
+  }
+
+  void clearPolygons() {
+    _channel.invokeMethod('clearPolygons');
+  }
+
+  void addPolygon(Polygon polygon) {
+    if (_polygons.containsKey(polygon.id)) {
+      return;
+    }
+    _polygons[polygon.id] = polygon;
+    _channel.invokeMethod('addPolygon', polygon.toMap());
+  }
+
+  void removePolygon(Polygon polygon) {
+    if (!_polygons.containsKey(polygon.id)) {
+      return;
+    }
+    _polygons.remove(polygon.id);
+    _channel.invokeMethod('removePolygon', polygon.toMap());
+  }
+
   void zoomToFit({int padding: 50}) {
     _channel.invokeMethod('zoomToFit', padding);
   }
 
-  void zoomTo(List<String> annotationIds, {double padding: 50.0}) {
+  void zoomToAnnotations(List<String> annotationIds, {double padding: 50.0}) {
     _channel.invokeMethod('zoomToAnnotations',
         {"annotations": annotationIds, "padding": padding});
+  }
+
+  void zoomToPolylines(List<String> polylines, {double padding: 50.0}) {
+    _channel.invokeMethod(
+        'zoomToPolylines', {"polylines": polylines, "padding": padding});
+  }
+
+  void zoomToPolygons(List<String> polygonsIds, {double padding: 50.0}) {
+    _channel.invokeMethod(
+        'zoomToPolygons', {"polygons": polygonsIds, "padding": padding});
   }
 
   void setCameraPosition(double latitude, double longitude, double zoom) {
@@ -116,7 +198,7 @@ class MapView {
   }
 
   Future<List<Marker>> get visibleAnnotations async {
-    List<String> ids = await _channel.invokeMethod("getVisibleMarkers");
+    List<dynamic> ids = await _channel.invokeMethod("getVisibleMarkers");
     var annotations = <Marker>[];
     for (var id in ids) {
       var annotation = _annotations[id];
@@ -125,7 +207,32 @@ class MapView {
     return annotations;
   }
 
+  Future<List<Polyline>> get visiblePolyLines async {
+    List<dynamic> ids = await _channel.invokeMethod("getVisiblePolylines");
+    var polylines = <Polyline>[];
+    for (var id in ids) {
+      var polyline = _polylines[id];
+      polylines.add(polyline);
+    }
+    return polylines;
+  }
+
+  Future<List<Polygon>> get visiblePolygons async {
+    List<dynamic> ids = await _channel.invokeMethod("getVisiblePolygons");
+    var polygons = <Polygon>[];
+    for (var id in ids) {
+      var polygon = _polygons[id];
+      polygons.add(polygon);
+    }
+    return polygons;
+  }
+
   Stream<Marker> get onTouchAnnotation => _annotationStreamController.stream;
+
+  Stream<Polyline> get onTouchPolyline =>
+      _polylineStreamController.stream;
+
+  Stream<Polygon> get onTouchPolygon => _polygonStreamController.stream;
 
   Stream<Location> get onLocationUpdated =>
       _locationChangeStreamController.stream;
@@ -156,6 +263,20 @@ class MapView {
         var annotation = _annotations[id];
         if (annotation != null) {
           _annotationStreamController.add(annotation);
+        }
+        return new Future.value("");
+      case "polylineTapped":
+        String id = call.arguments;
+        var polyline = _polylines[id];
+        if (polyline != null) {
+          _polylineStreamController.add(polyline);
+        }
+        return new Future.value("");
+      case "polygonTapped":
+        String id = call.arguments;
+        var polygon = _polygons[id];
+        if (polygon != null) {
+          _polygonStreamController.add(polygon);
         }
         return new Future.value("");
       case "infoWindowTapped":

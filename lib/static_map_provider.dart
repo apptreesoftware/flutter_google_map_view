@@ -45,6 +45,22 @@ class StaticMapProvider {
   }
 
   ///
+  /// Creates a Uri for the Google Static Maps API using a list of locations to create pins on the map
+  /// [locations] must have at least 1 location
+  /// Specify a [width] and [height] that you would like the resulting image to be. The default is 600w x 400h
+  /// Centers the map on [center] using a zoom of [zoomLevel]
+  ///
+  Uri getStaticUriWithMarkersAndZoom(List<Marker> markers,
+      {int width,
+      int height,
+      StaticMapViewType maptype,
+      Location center,
+      int zoomLevel}) {
+    return _buildUrl(markers, center, zoomLevel, width ?? defaultWidth,
+        height ?? defaultHeight, maptype ?? defaultMaptype);
+  }
+
+  ///
   /// Creates a Uri for the Google Static Maps API using an active MapView
   /// This method is useful for generating a static image
   /// [mapView] must currently be visible when you call this.

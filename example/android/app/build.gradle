@@ -16,7 +16,7 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 27
     buildToolsVersion '25.0.3'
 
     sourceSets {
@@ -31,7 +31,7 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.apptreesoftware.mapviewexample"
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -51,5 +51,5 @@ flutter {
 }
 
 dependencies {
-    compile 'org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.4-2'
+    compile 'org.jetbrains.kotlin:kotlin-stdlib-jre7:1.2.41'
 }
