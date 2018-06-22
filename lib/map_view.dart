@@ -23,6 +23,12 @@ class MapView {
   MethodChannel _channel = const MethodChannel("com.apptreesoftware.map_view");
   StreamController<Marker> _annotationStreamController =
       new StreamController.broadcast();
+  StreamController<Map<Marker, Location>> _annotationDragStartController =
+      new StreamController.broadcast();
+  StreamController<Map<Marker, Location>> _annotationDragEndController =
+      new StreamController.broadcast();
+  StreamController<Map<Marker, Location>> _annotationDragController =
+      new StreamController.broadcast();
   StreamController<Polyline> _polylineStreamController =
       new StreamController.broadcast();
   StreamController<Polygon> _polygonStreamController =
@@ -228,8 +234,14 @@ class MapView {
 
   Stream<Marker> get onTouchAnnotation => _annotationStreamController.stream;
 
-  Stream<Polyline> get onTouchPolyline =>
-      _polylineStreamController.stream;
+  Stream<Map<Marker, Location>> get onAnnotationDragStart =>
+      _annotationDragStartController.stream;
+
+  Stream<Map<Marker, Location>> get onAnnotationDragEnd => _annotationDragEndController.stream;
+
+  Stream<Map<Marker, Location>> get onAnnotationDrag => _annotationDragController.stream;
+
+  Stream<Polyline> get onTouchPolyline => _polylineStreamController.stream;
 
   Stream<Polygon> get onTouchPolygon => _polygonStreamController.stream;
 
@@ -260,6 +272,39 @@ class MapView {
         var annotation = _annotations[id];
         if (annotation != null) {
           _annotationStreamController.add(annotation);
+        }
+        return new Future.value("");
+      case "annotationDragStart":
+        String id = call.arguments["id"];
+        var annotation = _annotations[id];
+        var latitude = call.arguments["latitude"];
+        var longitude = call.arguments["longitude"];
+        if (annotation != null) {
+          Map<Marker, Location> map = new Map();
+          map.putIfAbsent(annotation, () => new Location(latitude, longitude));
+          _annotationDragStartController.add(map);
+        }
+        return new Future.value("");
+      case "annotationDragEnd":
+        String id = call.arguments["id"];
+        var annotation = _annotations[id];
+        var latitude = call.arguments["latitude"];
+        var longitude = call.arguments["longitude"];
+        if (annotation != null) {
+          Map<Marker, Location> map = new Map();
+          map.putIfAbsent(annotation, () => new Location(latitude, longitude));
+          _annotationDragEndController.add(map);
+        }
+        return new Future.value("");
+      case "annotationDrag":
+        String id = call.arguments["id"];
+        var annotation = _annotations[id];
+        var latitude = call.arguments["latitude"];
+        var longitude = call.arguments["longitude"];
+        if (annotation != null) {
+          Map<Marker, Location> map = new Map();
+          map.putIfAbsent(annotation, () => new Location(latitude, longitude));
+          _annotationDragController.add(map);
         }
         return new Future.value("");
       case "polylineTapped":

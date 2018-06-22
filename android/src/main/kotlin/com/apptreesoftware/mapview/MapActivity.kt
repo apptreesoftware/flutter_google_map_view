@@ -3,6 +3,9 @@ package com.apptreesoftware.mapview
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.content.res.AssetFileDescriptor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -51,7 +54,28 @@ class MapActivity : AppCompatActivity(),
                 map.uiSettings.isMyLocationButtonEnabled = MapViewPlugin.showMyLocationButton
             }
         }
+        map.setOnMarkerDragListener(object : GoogleMap.OnMarkerDragListener {
+            override fun onMarkerDragEnd(p0: Marker?) {
+                if (p0 != null) {
+                    val id: String = p0.tag as String
+                    MapViewPlugin.annotationDragEnd(id, p0.position)
+                }
+            }
 
+            override fun onMarkerDragStart(p0: Marker?) {
+                if (p0 != null) {
+                    val id: String = p0.tag as String
+                    MapViewPlugin.annotationDragStart(id, p0.position)
+                }
+            }
+
+            override fun onMarkerDrag(p0: Marker?) {
+                if (p0 != null) {
+                    val id: String = p0.tag as String
+                    MapViewPlugin.annotationDrag(id, p0.position)
+                }
+            }
+        })
         map.setOnMapClickListener { latLng ->
             MapViewPlugin.mapTapped(latLng)
         }
@@ -361,26 +385,31 @@ class MapActivity : AppCompatActivity(),
     }
 
     fun createMarkerForAnnotation(annotation: MapAnnotation, map: GoogleMap): Marker {
-        val marker: Marker
+        val markerOptions = MarkerOptions()
+                .position(annotation.coordinate)
+                .title(annotation.title)
+                .draggable(annotation.draggable)
         if (annotation is ClusterAnnotation) {
-            marker = map
-                    .addMarker(MarkerOptions()
-                            .position(annotation.coordinate)
-                            .title(annotation.title)
-                            .icon(
-                                    BitmapDescriptorFactory.defaultMarker(
-                                            annotation.colorHue)))
-            marker.tag = annotation.identifier
-        } else {
-            marker = map
-                    .addMarker(MarkerOptions()
-                            .position(annotation.coordinate)
-                            .title(annotation.title)
-                            .icon(
-                                    BitmapDescriptorFactory.defaultMarker(
-                                            annotation.colorHue)))
-            marker.tag = annotation.identifier
+            markerOptions.snippet(annotation.clusterCount.toString())
         }
+        var bitmap: Bitmap? = null
+        if (annotation.icon.isNotBlank()) {
+            val assetFileDescriptor: AssetFileDescriptor = MapViewPlugin.getAssetFileDecriptor(annotation.icon)
+            try {
+                val fd = assetFileDescriptor.createInputStream()
+                bitmap = BitmapFactory.decodeStream(fd)
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
+        }
+        if (bitmap != null) {
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+        } else {
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(
+                    annotation.colorHue))
+        }
+        val marker = map.addMarker(markerOptions)
+        marker.tag = annotation.identifier
         return marker
     }
 

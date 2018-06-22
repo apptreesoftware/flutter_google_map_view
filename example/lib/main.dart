@@ -33,8 +33,14 @@ class _MyAppState extends State<MyApp> {
   //Marker bubble
   List<Marker> _markers = <Marker>[
     new Marker(
-        "1", "Something fragile!", 45.52480841512737, -122.66201455146073,
-        color: Colors.blue),
+      "1",
+      "Something fragile!",
+      45.52480841512737,
+      -122.66201455146073,
+      color: Colors.blue,
+      draggable: true, //Allows the user to move the marker.
+      icon: "images/flower_vase.png",
+    ),
   ];
 
   //Line
@@ -210,6 +216,21 @@ class _MyAppState extends State<MyApp> {
     compositeSubscription.add(sub);
     sub = mapView.onCameraChanged.listen((cameraPosition) =>
         this.setState(() => this.cameraPosition = cameraPosition));
+    compositeSubscription.add(sub);
+    sub = mapView.onAnnotationDragStart.listen((markerMap) {
+      var marker = markerMap.keys.first;
+      print("Annotation ${marker.id} dragging started");
+    });
+    sub = mapView.onAnnotationDragEnd.listen((markerMap) {
+      var marker = markerMap.keys.first;
+      print("Annotation ${marker.id} dragging ended");
+    });
+    sub = mapView.onAnnotationDrag.listen((markerMap) {
+      var marker = markerMap.keys.first;
+      var location = markerMap[marker];
+      print("Annotation ${marker.id} moved to ${location.latitude} , ${location
+          .longitude}");
+    });
     compositeSubscription.add(sub);
     sub = mapView.onToolbarAction.listen((id) {
       print("Toolbar button id = $id");

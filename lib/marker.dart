@@ -5,7 +5,9 @@ class Marker {
   final String title;
   final double latitude;
   final double longitude;
+  final String icon;
   final Color color;
+  final bool draggable;
 
   static const Color _defaultColor = const Color(-769226);
 
@@ -14,7 +16,9 @@ class Marker {
     this.title,
     this.latitude,
     this.longitude, {
+    this.icon: "",
     this.color: _defaultColor,
+    this.draggable: false,
   });
 
   @override
@@ -31,7 +35,9 @@ class Marker {
       "title": title,
       "latitude": latitude,
       "longitude": longitude,
+      "icon": icon != null ? icon : "",
       "type": "pin",
+      "draggable": draggable,
       "color": {
         "r": color.red,
         "g": color.green,

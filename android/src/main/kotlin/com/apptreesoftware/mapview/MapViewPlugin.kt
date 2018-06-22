@@ -2,6 +2,7 @@ package com.apptreesoftware.mapview
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.AssetFileDescriptor
 import android.location.Location
 import android.os.Build
 import com.google.android.gms.common.GoogleApiAvailability
@@ -44,12 +45,14 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         var mapActivity: MapActivity? = null
         val REQUEST_GOOGLE_PLAY_SERVICES = 1000
         var mapViewType: Int = GoogleMap.MAP_TYPE_NORMAL
+        lateinit var registrar: Registrar
 
         @JvmStatic
         fun registerWith(registrar: Registrar): Unit {
             channel = MethodChannel(registrar.messenger(), "com.apptreesoftware.map_view")
             val plugin = MapViewPlugin(activity = registrar.activity())
             channel.setMethodCallHandler(plugin)
+            this.registrar = registrar
         }
 
         fun handleToolbarAction(id: Int) {
@@ -82,6 +85,30 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
 
         fun annotationTapped(id: String) {
             this.channel.invokeMethod("annotationTapped", id)
+        }
+
+        fun annotationDragStart(id: String, latLng: LatLng) {
+            this.channel.invokeMethod("annotationDragStart", mapOf(
+                    "id" to id,
+                    "latitude" to latLng.latitude,
+                    "longitude" to latLng.longitude
+            ))
+        }
+
+        fun annotationDragEnd(id: String, latLng: LatLng) {
+            this.channel.invokeMethod("annotationDragEnd", mapOf(
+                    "id" to id,
+                    "latitude" to latLng.latitude,
+                    "longitude" to latLng.longitude
+            ))
+        }
+
+        fun annotationDrag(id: String, latLng: LatLng) {
+            this.channel.invokeMethod("annotationDrag", mapOf(
+                    "id" to id,
+                    "latitude" to latLng.latitude,
+                    "longitude" to latLng.longitude
+            ))
         }
 
         fun polylineTapped(id: String) {
@@ -118,6 +145,12 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         fun infoWindowTapped(id: String) {
             this.channel.invokeMethod("infoWindowTapped", id)
         }
+
+        fun getAssetFileDecriptor(asset: String): AssetFileDescriptor {
+            val assetManager = registrar.context().getAssets()
+            val key = registrar.lookupKeyForAsset(asset)
+            return assetManager.openFd(key)
+        }
     }
 
     override fun onMethodCall(call: MethodCall, result: Result): Unit {
@@ -139,8 +172,8 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
                 mapTitle = mapOptions["title"] as String
 
                 if (mapOptions["mapViewType"] != null) {
-                    var mappedMapType: Int? = mapTypeMapping.get(mapOptions["mapViewType"]);
-                    if (mappedMapType != null) mapViewType = mappedMapType as Int;
+                    val mappedMapType: Int? = mapTypeMapping.get(mapOptions["mapViewType"]);
+                    if (mappedMapType != null) mapViewType = mappedMapType;
                 }
 
                 val intent = Intent(activity, MapActivity::class.java)
