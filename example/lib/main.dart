@@ -11,7 +11,7 @@ import 'package:map_view/polyline.dart';
 /// - Static Maps API
 /// - Android Maps API
 /// - iOS Maps API
-const API_KEY = "AIzaSyDv2UaDTnfXOO5owAG1Vg49ceYAfAYW3xU";
+const API_KEY = "<your-api-key>";
 
 void main() {
   MapView.setApiKey(API_KEY);

@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -393,15 +394,23 @@ class MapActivity : AppCompatActivity(),
             markerOptions.snippet(annotation.clusterCount.toString())
         }
         var bitmap: Bitmap? = null
-        if (annotation.icon.isNotBlank()) {
-            val assetFileDescriptor: AssetFileDescriptor = MapViewPlugin.getAssetFileDecriptor(annotation.icon)
+        if (annotation.icon != null) {
             try {
+                val assetFileDescriptor: AssetFileDescriptor = MapViewPlugin.getAssetFileDecriptor(annotation.icon.asset)
                 val fd = assetFileDescriptor.createInputStream()
                 bitmap = BitmapFactory.decodeStream(fd)
+                var width = annotation.icon.width
+                var height = annotation.icon.height
+                if (width == 0.0)
+                    width = bitmap.width.toDouble()
+                if (height == 0.0)
+                    height = bitmap.height.toDouble()
+                bitmap = Bitmap.createScaledBitmap(bitmap, width.toInt(), height.toInt(), false)
             } catch (exception: Exception) {
                 exception.printStackTrace()
             }
         }
+        Log.d("Bitmap","${bitmap}")
         if (bitmap != null) {
             markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
         } else {

@@ -61,10 +61,16 @@ class MarkerIcon {
   ///Width of the image icon.
   ///
   ///Should not be 0.0, otherwise the image original width will be used.
+  ///
+  ///Sizes behave differently in each platform, so change this value to match
+  ///the desired look in each platform.
   double width;
   ///Height of the image icon.
   ///
   ///Should not be 0.0, otherwise the image original height will be used.
+  ///
+  ///Sizes behave differently in each platform, so change this value to match
+  ///the desired look in each platform.
   double height;
 
   MarkerIcon(
