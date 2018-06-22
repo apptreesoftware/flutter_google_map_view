@@ -11,7 +11,7 @@ import 'package:map_view/polyline.dart';
 /// - Static Maps API
 /// - Android Maps API
 /// - iOS Maps API
-const API_KEY = "<your-api-key>";
+const API_KEY = "AIzaSyDv2UaDTnfXOO5owAG1Vg49ceYAfAYW3xU";
 
 void main() {
   MapView.setApiKey(API_KEY);
@@ -39,7 +39,11 @@ class _MyAppState extends State<MyApp> {
       -122.66201455146073,
       color: Colors.blue,
       draggable: true, //Allows the user to move the marker.
-      icon: "images/flower_vase.png",
+      markerIcon: new MarkerIcon(
+        "images/flower_vase.png",
+        width: 112.0,
+        height: 75.0,
+      ),
     ),
   ];
 

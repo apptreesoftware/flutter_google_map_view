@@ -12,14 +12,15 @@
             methodChannelWithName:@"com.apptreesoftware.map_view"
                   binaryMessenger:[registrar messenger]];
     UIViewController *host = UIApplication.sharedApplication.delegate.window.rootViewController;
-    MapViewPlugin *instance = [[MapViewPlugin alloc] initWithHost:host channel:channel];
+    MapViewPlugin *instance = [[MapViewPlugin alloc] initWithHost:host channel:channel registrar:registrar];
     [registrar addMethodCallDelegate:instance channel:channel];
 }
 
-- (id)initWithHost:(UIViewController *)host channel:(FlutterMethodChannel *)channel {
+- (id)initWithHost:(UIViewController *)host channel:(FlutterMethodChannel *)channel registrar:(NSObject <FlutterPluginRegistrar> *)registrar {
     if (self = [super init]) {
         self.host = host;
         self.channel = channel;
+        self.registrar = registrar;
     }
     return self;
 }
@@ -238,8 +239,17 @@
                                                               }];
 }
 
-- (void)annotationTapped:(NSString *)identifier {
+- (void)annotationTapped:(NSString *)identifier{
     [self.channel invokeMethod:@"annotationTapped" arguments:identifier];
+}
+- (void)annotationDragStart:(NSString *)identifier position:(CLLocationCoordinate2D)position {
+    [self.channel invokeMethod:@"annotationDragStart" arguments:@{@"id": identifier, @"latitude": @(position.latitude),@"longitude": @(position.longitude)}];
+}
+- (void)annotationDragEnd:(NSString *)identifier position:(CLLocationCoordinate2D)position {
+    [self.channel invokeMethod:@"annotationDragEnd" arguments:@{@"id": identifier, @"latitude": @(position.latitude),@"longitude": @(position.longitude)}];
+}
+- (void)annotationDrag:(NSString *)identifier position:(CLLocationCoordinate2D)position{
+    [self.channel invokeMethod:@"annotationDrag" arguments:@{@"id": identifier, @"latitude": @(position.latitude),@"longitude": @(position.longitude)}];
 }
 - (void)polylineTapped:(NSString *)identifier {
     [self.channel invokeMethod:@"polylineTapped" arguments:identifier];
@@ -290,4 +300,11 @@
     }
     return mapType;
 }
+
+-(NSString *) getAssetPath:(NSString *)iconPath{
+    NSString* key = [self.registrar lookupKeyForAsset:iconPath];
+    NSString* path= [[NSBundle mainBundle] pathForResource:key ofType:nil];
+    return path;
+}
+
 @end

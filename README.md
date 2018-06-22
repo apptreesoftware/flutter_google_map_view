@@ -194,30 +194,6 @@ mapView.addMarker(new Marker("3", "10 Barrel", 45.5259467, -122.687747,
         color: Colors.purple));
 ```
 
-#### Add multiple polylines to the map
-```dart
-mapView.setPolylines(<Polyline>[
-        new Polyline(
-          "11",
-          <Location>[
-            new Location(45.523970, -122.663081),
-            new Location(45.528788, -122.684633),
-            new Location(45.528864, -122.667195),
-          ],
-          jointType: FigureJointType.round,
-          width: 15.0,
-          color: Colors.orangeAccent,
-        ),
-        new Polyline(
-          "12",
-          <Location>[
-            new Location(45.519698, -122.674932),
-            new Location(45.516687, -122.667014),
-          ],
-          width: 15.0,
-        ),
-      ]);
-```
 #### Edit custom Marker image
 First add your assets to a folder in your project directory. The name of the folder could be any but "images" or "assets" are the more common.
 It should look like this.
@@ -242,16 +218,21 @@ flutter:
         - images/flower_vase.png
 ```
 
-Finally use the asset name as icon for your marker.
+Finally use the asset name as icon for your marker. If the width or height is not set or is equals to 0, the image original value of said attribute will be used.
 
 ```dart
-Marker marker=new Marker(
+new Marker(
       "1",
       "Something fragile!",
       45.52480841512737,
       -122.66201455146073,
-      icon: "images/flower_vase.png", //Asset used as icon
-      color: Colors.blue, //If the icon can't be loaded the plugin will use the default marker with this color.
+      color: Colors.blue,
+      draggable: true, //Allows the user to move the marker.
+      markerIcon: new MarkerIcon(
+        "images/flower_vase.png", //Asset to be used as icon
+        width: 112.0, //New width for the asset
+        height: 75.0, // New height for the asset
+      ),
     );
 ```
 #### Set a Marker draggable and listening to position changes
@@ -298,6 +279,49 @@ mapView.addPolyline(new Polyline(
           ],
           width: 15.0));
 ```
+
+#### Add multiple polylines to the map
+```dart
+mapView.setPolylines(<Polyline>[
+        new Polyline(
+          "11",
+          <Location>[
+            new Location(45.523970, -122.663081),
+            new Location(45.528788, -122.684633),
+            new Location(45.528864, -122.667195),
+          ],
+          jointType: FigureJointType.round,
+          width: 15.0,
+          color: Colors.orangeAccent,
+        ),
+        new Polyline(
+          "12",
+          <Location>[
+            new Location(45.519698, -122.674932),
+            new Location(45.516687, -122.667014),
+          ],
+          width: 15.0,
+        ),
+      ]);
+```
+
+#### Add a single polygon to the map
+```dart
+mapView.addPolygon(new Polygon(
+                                 "111",
+                                 <Location>[
+                                   new Location(45.5231233, -122.6733130),
+                                   new Location(45.5233225, -122.6732969),
+                                   new Location(45.5232398, -122.6733506),
+                                   new Location(45.5231233, -122.6733130),
+                                 ],
+                                 jointType: FigureJointType.round,
+                                 strokeWidth: 5.0,
+                                 strokeColor: Colors.red,
+                                 fillColor: Color.fromARGB(75, 255, 0, 0),
+                                 ));
+```
+
 #### Add multiple polygons to the map
 ```dart
  mapView.setPolygons(<Polygon>[
@@ -339,22 +363,12 @@ mapView.addPolyline(new Polyline(
       ]);
 ```
 
-#### Add a single polygon to the map
+#### Remove elements from the map
 ```dart
-mapView.addPolygon(new Polygon(
-                                 "111",
-                                 <Location>[
-                                   new Location(45.5231233, -122.6733130),
-                                   new Location(45.5233225, -122.6732969),
-                                   new Location(45.5232398, -122.6733506),
-                                   new Location(45.5231233, -122.6733130),
-                                 ],
-                                 jointType: FigureJointType.round,
-                                 strokeWidth: 5.0,
-                                 strokeColor: Colors.red,
-                                 fillColor: Color.fromARGB(75, 255, 0, 0),
-                                 ));
+//Remove all markers
+mapView.clearA
 ```
+
 #### Zoom to fit all the pins on the map
 ```dart
 mapView.zoomToFit(padding: 100);
