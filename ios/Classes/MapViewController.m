@@ -219,6 +219,7 @@
     }
     marker.position = annotation.coordinate;
     marker.title = annotation.title;
+    marker.rotation = annotation.rotation;
     marker.userData = annotation.identifier;
     marker.draggable = annotation.draggable;
     return marker;

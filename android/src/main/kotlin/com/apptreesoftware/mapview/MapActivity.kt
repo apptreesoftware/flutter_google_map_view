@@ -390,6 +390,7 @@ class MapActivity : AppCompatActivity(),
                 .position(annotation.coordinate)
                 .title(annotation.title)
                 .draggable(annotation.draggable)
+                .rotation(annotation.rotation.toFloat())
         if (annotation is ClusterAnnotation) {
             markerOptions.snippet(annotation.clusterCount.toString())
         }
@@ -410,7 +411,7 @@ class MapActivity : AppCompatActivity(),
                 exception.printStackTrace()
             }
         }
-        Log.d("Bitmap","${bitmap}")
+        Log.d("Bitmap", "${bitmap}")
         if (bitmap != null) {
             markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
         } else {

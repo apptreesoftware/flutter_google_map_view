@@ -11,6 +11,7 @@
 @property (nonatomic, retain) NSString *title;
 @property (nonatomic, retain) MarkerIcon *icon;
 @property (nonatomic, assign) CLLocationCoordinate2D coordinate;
+@property (nonatomic)double rotation;
 @property (nonatomic, retain) UIColor *color;
 @property (nonatomic, assign) BOOL draggable;
 

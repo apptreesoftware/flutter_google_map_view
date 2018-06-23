@@ -3,14 +3,15 @@ package com.apptreesoftware.mapview
 import android.graphics.Color
 import com.google.android.gms.maps.model.LatLng
 
-open class MapAnnotation(val identifier: String, val title: String, val coordinate: LatLng, val icon: MarkerIcon?,
-                         val color: Int, val draggable: Boolean) {
+open class MapAnnotation(val identifier: String, val title: String, val coordinate: LatLng, val rotation: Double,
+                         val icon: MarkerIcon?, val color: Int, val draggable: Boolean) {
     companion object {
         fun fromMap(map: Map<String, Any>): MapAnnotation? {
             val type = map["type"] as String? ?: return null
             val identifier = map["id"] as String
             val latitude = map["latitude"] as Double
             val longitude = map["longitude"] as Double
+            val rotation = map["rotation"] as Double
             val title = map["title"] as String
             var icon: MarkerIcon? = null
             if (map.containsKey("markerIcon"))
@@ -20,10 +21,10 @@ open class MapAnnotation(val identifier: String, val title: String, val coordina
             val draggable = map["draggable"] as Boolean
             if (type == "cluster") {
                 val clusterCount = map["clusterCount"] as Int
-                return ClusterAnnotation(identifier, title, LatLng(latitude, longitude), icon, color, draggable,
+                return ClusterAnnotation(identifier, title, LatLng(latitude, longitude), rotation, icon, color, draggable,
                         clusterCount)
             }
-            return MapAnnotation(identifier, title, LatLng(latitude, longitude), icon, color, draggable)
+            return MapAnnotation(identifier, title, LatLng(latitude, longitude), rotation, icon, color, draggable)
         }
     }
 
@@ -38,10 +39,11 @@ open class MapAnnotation(val identifier: String, val title: String, val coordina
 class ClusterAnnotation(identifier: String,
                         title: String,
                         coordinate: LatLng,
+                        rotation: Double,
                         icon: MarkerIcon?,
                         color: Int,
                         draggable: Boolean,
-                        val clusterCount: Int) : MapAnnotation(identifier, title, coordinate, icon, color, draggable)
+                        val clusterCount: Int) : MapAnnotation(identifier, title, coordinate, rotation, icon, color, draggable)
 
 fun colorFromMap(map: Map<String, Int>): Int {
     val r = map["r"] ?: 0

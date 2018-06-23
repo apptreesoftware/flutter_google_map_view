@@ -137,6 +137,7 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
                     "time" to loc.time,
                     "altitude" to loc.altitude,
                     "speed" to loc.speed,
+                    "bearing" to loc.bearing,
                     "horizontalAccuracy" to loc.accuracy,
                     "verticalAccuracy" to verticalAccuracy
             ))

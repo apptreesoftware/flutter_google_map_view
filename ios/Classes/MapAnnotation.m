@@ -15,6 +15,7 @@
         self.identifier = dictionary[@"id"];
         self.title = dictionary[@"title"];
         self.draggable= [dictionary[@"draggable"] boolValue];
+        self.rotation= [dictionary[@"rotation"] doubleValue];
         if([dictionary objectForKey:@"markerIcon"]!=nil){
             self.icon = [MarkerIcon markerIconFromDictionary:dictionary[@"markerIcon"]];
         }

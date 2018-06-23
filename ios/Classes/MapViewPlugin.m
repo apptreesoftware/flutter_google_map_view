@@ -228,12 +228,13 @@
 
 - (void)locationDidUpdate:(CLLocation *)location {
     NSInteger time = location.timestamp.timeIntervalSince1970;
-    time *= 1000;
+    time *= 1000;
     [self.channel invokeMethod:@"locationUpdated" arguments:@{@"latitude": @(location.coordinate.latitude),
                                                               @"longitude": @(location.coordinate.longitude),
                                                               @"time":@(time),
                                                               @"altitude":@(location.altitude),
                                                               @"speed":@(location.speed),
+                                                              @"bearing":@(location.course),
                                                               @"horizontalAccuracy":@(location.horizontalAccuracy),
                                                               @"verticalAccuracy":@(location.verticalAccuracy)
                                                               }];

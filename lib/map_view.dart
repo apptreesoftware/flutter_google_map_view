@@ -97,6 +97,7 @@ class MapView {
 
   void clearAnnotations() {
     _channel.invokeMethod('clearAnnotations');
+    _annotations.clear();
   }
 
   void addMarker(Marker marker) {
@@ -124,6 +125,7 @@ class MapView {
 
   void clearPolylines() {
     _channel.invokeMethod('clearPolylines');
+    _polylines.clear();
   }
 
   void addPolyline(Polyline polyline) {
@@ -151,6 +153,7 @@ class MapView {
 
   void clearPolygons() {
     _channel.invokeMethod('clearPolygons');
+    _polygons.clear();
   }
 
   void addPolygon(Polygon polygon) {
@@ -237,9 +240,11 @@ class MapView {
   Stream<Map<Marker, Location>> get onAnnotationDragStart =>
       _annotationDragStartController.stream;
 
-  Stream<Map<Marker, Location>> get onAnnotationDragEnd => _annotationDragEndController.stream;
+  Stream<Map<Marker, Location>> get onAnnotationDragEnd =>
+      _annotationDragEndController.stream;
 
-  Stream<Map<Marker, Location>> get onAnnotationDrag => _annotationDragController.stream;
+  Stream<Map<Marker, Location>> get onAnnotationDrag =>
+      _annotationDragController.stream;
 
   Stream<Polyline> get onTouchPolyline => _polylineStreamController.stream;
 
