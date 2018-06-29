@@ -219,7 +219,7 @@
 
 - (void)handleSetCamera:(NSDictionary *)cameraUpdate {
     CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([cameraUpdate[@"latitude"] doubleValue], [cameraUpdate[@"longitude"] doubleValue]);
-    [self.mapViewController setCamera:coordinate zoom:[cameraUpdate[@"zoom"] floatValue]];
+    [self.mapViewController setCamera:coordinate zoom:[cameraUpdate[@"zoom"] floatValue] bearing:[cameraUpdate[@"bearing"] doubleValue] tilt:[cameraUpdate[@"tilt"] doubleValue]];
 }
 
 - (void)onMapReady {

@@ -193,6 +193,7 @@ class _MyAppState extends State<MyApp> {
             showUserLocation: true,
             showMyLocationButton: true,
             showCompassButton: true,
+            initialCameraPosition: new CameraPosition(new Location(45.526607443935724, -122.66731660813093), 15.0),
             hideToolbar: false,
             title: "Recently Visited"),
         toolbarActions: [new ToolbarAction("Close", 1)]);
@@ -200,15 +201,10 @@ class _MyAppState extends State<MyApp> {
       mapView.setMarkers(_markers);
       mapView.setPolylines(_lines);
       mapView.setPolygons(_polygons);
-      mapView.zoomToFit(padding: 100);
     });
     compositeSubscription.add(sub);
     sub = mapView.onLocationUpdated.listen((location) {
       print("Location updated $location");
-      mapView.setCameraPosition(new CameraPosition(
-        new Location(location.latitude, location.longitude),
-        18.0,
-      ));
     });
     compositeSubscription.add(sub);
     sub = mapView.onTouchAnnotation

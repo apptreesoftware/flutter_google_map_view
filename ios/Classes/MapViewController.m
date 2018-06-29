@@ -94,8 +94,8 @@
     [self.plugin onMapReady];
 }
 
-- (void)setCamera:(CLLocationCoordinate2D)location zoom:(float)zoom {
-    [self.mapView animateToCameraPosition:[GMSCameraPosition cameraWithTarget:location zoom:zoom]];
+- (void)setCamera:(CLLocationCoordinate2D)location zoom:(float)zoom bearing:(CLLocationDirection)bearing tilt:(double)tilt {
+    [self.mapView animateToCameraPosition:[GMSCameraPosition cameraWithTarget:location zoom:zoom bearing:bearing viewingAngle:tilt]];
 }
 
 - (void)updateAnnotations:(NSArray *)annotations {
