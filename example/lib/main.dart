@@ -203,8 +203,13 @@ class _MyAppState extends State<MyApp> {
       mapView.zoomToFit(padding: 100);
     });
     compositeSubscription.add(sub);
-    sub = mapView.onLocationUpdated
-        .listen((location) => print("Location updated $location"));
+    sub = mapView.onLocationUpdated.listen((location) {
+      print("Location updated $location");
+      mapView.setCameraPosition(new CameraPosition(
+        new Location(location.latitude, location.longitude),
+        18.0,
+      ));
+    });
     compositeSubscription.add(sub);
     sub = mapView.onTouchAnnotation
         .listen((annotation) => print("annotation ${annotation.id} tapped"));

@@ -270,6 +270,8 @@
     [self.channel invokeMethod:@"cameraPositionChanged" arguments:@{
             @"latitude": @(position.target.latitude),
             @"longitude": @(position.target.longitude),
+            @"bearing": @(position.bearing),
+            @"tilt": @(position.viewingAngle),
             @"zoom": @(position.zoom)
     }];
 }

@@ -191,9 +191,8 @@ class MapView {
         'zoomToPolygons', {"polygons": polygonsIds, "padding": padding});
   }
 
-  void setCameraPosition(double latitude, double longitude, double zoom) {
-    _channel.invokeMethod("setCamera",
-        {"latitude": latitude, "longitude": longitude, "zoom": zoom});
+  void setCameraPosition(CameraPosition cameraPosition) {
+    _channel.invokeMethod("setCamera", cameraPosition.toMap());
   }
 
   Future<Location> get centerLocation async {

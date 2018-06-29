@@ -21,7 +21,7 @@
       cameraPosition:(GMSCameraPosition *)cameraPosition;
 
 - (void)shutdown;
-- (void)setCamera:(CLLocationCoordinate2D)location zoom:(float)zoom;
+- (void)setCamera:(CLLocationCoordinate2D)location zoom:(float)zoom bearing:(CLLocationDirection)bearing tilt:(double)tilt;
 
 - (void)updateAnnotations:(NSArray *)annotations;
 - (void)clearAnnotations;

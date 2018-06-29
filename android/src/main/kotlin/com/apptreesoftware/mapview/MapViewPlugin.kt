@@ -123,7 +123,9 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
             this.channel.invokeMethod("cameraPositionChanged", mapOf(
                     "latitude" to pos.target.latitude,
                     "longitude" to pos.target.longitude,
-                    "zoom" to pos.zoom
+                    "zoom" to pos.zoom,
+                    "bearing" to pos.bearing,
+                    "tilt" to pos.tilt
             ))
         }
 
@@ -278,7 +280,9 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         val lat = map["latitude"] as Double
         val lng = map["longitude"] as Double
         val zoom = map["zoom"] as Double
-        mapActivity?.setCamera(LatLng(lat, lng), zoom.toFloat())
+        val bearing = map["bearing"] as Double
+        val tilt = map["tilt"] as Double
+        mapActivity?.setCamera(LatLng(lat, lng), zoom.toFloat(), bearing.toFloat(), tilt.toFloat())
     }
 
     fun handleZoomToAnnotations(map: Map<String, Any>) {

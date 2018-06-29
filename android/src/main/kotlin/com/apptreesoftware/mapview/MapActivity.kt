@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -134,9 +133,14 @@ class MapActivity : AppCompatActivity(),
         get() = googleMap?.cameraPosition?.target ?: LatLng(0.0,
                 0.0)
 
-    fun setCamera(target: LatLng, zoom: Float) {
-        googleMap?.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(target, zoom))
+    fun setCamera(target: LatLng, zoom: Float, bearing: Float, tilt: Float) {
+        val cameraPosition = CameraPosition.Builder()
+                .target(target)
+                .zoom(zoom)
+                .bearing(bearing)
+                .tilt(tilt)
+                .build()
+        googleMap?.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
     }
 
     fun setAnnotations(annotations: List<MapAnnotation>) {
@@ -411,7 +415,6 @@ class MapActivity : AppCompatActivity(),
                 exception.printStackTrace()
             }
         }
-        Log.d("Bitmap", "${bitmap}")
         if (bitmap != null) {
             markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
         } else {
