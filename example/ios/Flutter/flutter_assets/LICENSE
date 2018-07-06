@@ -44,6 +44,7 @@ source_map_stack_trace
 stream_channel
 typed_data
 utf
+vm_service_client
 
 Copyright 2015, the Dart project authors. All rights reserved.
 Redistribution and use in source and binary forms, with or without
@@ -3121,6 +3122,7 @@ glob
 http
 http_multi_server
 http_parser
+json_rpc_2
 matcher
 path
 pool

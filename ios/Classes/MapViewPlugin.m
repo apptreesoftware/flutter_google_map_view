@@ -12,14 +12,15 @@
             methodChannelWithName:@"com.apptreesoftware.map_view"
                   binaryMessenger:[registrar messenger]];
     UIViewController *host = UIApplication.sharedApplication.delegate.window.rootViewController;
-    MapViewPlugin *instance = [[MapViewPlugin alloc] initWithHost:host channel:channel];
+    MapViewPlugin *instance = [[MapViewPlugin alloc] initWithHost:host channel:channel registrar:registrar];
     [registrar addMethodCallDelegate:instance channel:channel];
 }
 
-- (id)initWithHost:(UIViewController *)host channel:(FlutterMethodChannel *)channel {
+- (id)initWithHost:(UIViewController *)host channel:(FlutterMethodChannel *)channel registrar:(NSObject <FlutterPluginRegistrar> *)registrar {
     if (self = [super init]) {
         self.host = host;
         self.channel = channel;
+        self.registrar = registrar;
     }
     return self;
 }
@@ -44,10 +45,11 @@
                                                           navigationItems:[self buttonItemsFromActions:args[@"actions"]]
                                                            cameraPosition:[self cameraPositionFromDict:cameraDict]];
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
+        navController.navigationBar.hidden = [mapOptions[@"hideToolbar"] boolValue];
         navController.navigationBar.translucent = NO;
         [self.host presentViewController:navController animated:true completion:nil];
         self.mapViewController = vc;
-        [self.mapViewController setLocationEnabled:[mapOptions[@"showUserLocation"] boolValue]];
+        [self.mapViewController setMapOptions:[mapOptions[@"showUserLocation"] boolValue] locationButton:[mapOptions[@"showMyLocationButton"] boolValue] compassButton:[mapOptions[@"showCompassButton"] boolValue]];
         result(@YES);
     } else if ([@"getVisibleMarkers" isEqualToString:call.method]) {
         result(self.mapViewController.visibleMarkers);
@@ -217,7 +219,7 @@
 
 - (void)handleSetCamera:(NSDictionary *)cameraUpdate {
     CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([cameraUpdate[@"latitude"] doubleValue], [cameraUpdate[@"longitude"] doubleValue]);
-    [self.mapViewController setCamera:coordinate zoom:[cameraUpdate[@"zoom"] floatValue]];
+    [self.mapViewController setCamera:coordinate zoom:[cameraUpdate[@"zoom"] floatValue] bearing:[cameraUpdate[@"bearing"] doubleValue] tilt:[cameraUpdate[@"tilt"] doubleValue]];
 }
 
 - (void)onMapReady {
@@ -225,11 +227,30 @@
 }
 
 - (void)locationDidUpdate:(CLLocation *)location {
-    [self.channel invokeMethod:@"locationUpdated" arguments:@{@"latitude": @(location.coordinate.latitude), @"longitude": @(location.coordinate.longitude)}];
+    NSInteger time = location.timestamp.timeIntervalSince1970;
+    time *= 1000;
+    [self.channel invokeMethod:@"locationUpdated" arguments:@{@"latitude": @(location.coordinate.latitude),
+                                                              @"longitude": @(location.coordinate.longitude),
+                                                              @"time":@(time),
+                                                              @"altitude":@(location.altitude),
+                                                              @"speed":@(location.speed),
+                                                              @"bearing":@(location.course),
+                                                              @"horizontalAccuracy":@(location.horizontalAccuracy),
+                                                              @"verticalAccuracy":@(location.verticalAccuracy)
+                                                              }];
 }
 
-- (void)annotationTapped:(NSString *)identifier {
+- (void)annotationTapped:(NSString *)identifier{
     [self.channel invokeMethod:@"annotationTapped" arguments:identifier];
+}
+- (void)annotationDragStart:(NSString *)identifier position:(CLLocationCoordinate2D)position {
+    [self.channel invokeMethod:@"annotationDragStart" arguments:@{@"id": identifier, @"latitude": @(position.latitude),@"longitude": @(position.longitude)}];
+}
+- (void)annotationDragEnd:(NSString *)identifier position:(CLLocationCoordinate2D)position {
+    [self.channel invokeMethod:@"annotationDragEnd" arguments:@{@"id": identifier, @"latitude": @(position.latitude),@"longitude": @(position.longitude)}];
+}
+- (void)annotationDrag:(NSString *)identifier position:(CLLocationCoordinate2D)position{
+    [self.channel invokeMethod:@"annotationDrag" arguments:@{@"id": identifier, @"latitude": @(position.latitude),@"longitude": @(position.longitude)}];
 }
 - (void)polylineTapped:(NSString *)identifier {
     [self.channel invokeMethod:@"polylineTapped" arguments:identifier];
@@ -249,6 +270,8 @@
     [self.channel invokeMethod:@"cameraPositionChanged" arguments:@{
             @"latitude": @(position.target.latitude),
             @"longitude": @(position.target.longitude),
+            @"bearing": @(position.bearing),
+            @"tilt": @(position.viewingAngle),
             @"zoom": @(position.zoom)
     }];
 }
@@ -280,4 +303,11 @@
     }
     return mapType;
 }
+
+-(NSString *) getAssetPath:(NSString *)iconPath{
+    NSString* key = [self.registrar lookupKeyForAsset:iconPath];
+    NSString* path= [[NSBundle mainBundle] pathForResource:key ofType:nil];
+    return path;
+}
+
 @end

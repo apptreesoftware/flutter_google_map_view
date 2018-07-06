@@ -21,7 +21,7 @@
       cameraPosition:(GMSCameraPosition *)cameraPosition;
 
 - (void)shutdown;
-- (void)setCamera:(CLLocationCoordinate2D)location zoom:(float)zoom;
+- (void)setCamera:(CLLocationCoordinate2D)location zoom:(float)zoom bearing:(CLLocationDirection)bearing tilt:(double)tilt;
 
 - (void)updateAnnotations:(NSArray *)annotations;
 - (void)clearAnnotations;
@@ -45,7 +45,9 @@
 - (NSArray *)visiblePolylines;
 - (NSArray *)visiblePolygons;
 
-- (void)setLocationEnabled:(BOOL) enabled;
+- (void)setMapOptions:(BOOL)myLocationEnabled
+       locationButton:(BOOL)myLocationButton
+        compassButton:(BOOL)compassButton;
 
 @property (readonly) float zoomLevel;
 @property (readonly) CLLocationCoordinate2D centerLocation;

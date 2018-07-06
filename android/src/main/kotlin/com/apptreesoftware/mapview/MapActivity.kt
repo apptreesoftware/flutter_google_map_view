@@ -3,6 +3,9 @@ package com.apptreesoftware.mapview
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.content.res.AssetFileDescriptor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -22,7 +25,6 @@ class MapActivity : AppCompatActivity(),
     var polylineIdLookup = HashMap<String, Polyline>()
     var polygonIdLookup = HashMap<String, Polygon>()
     val PermissionRequest = 1
-    var tapCoordinate: LatLng? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +33,8 @@ class MapActivity : AppCompatActivity(),
         val mapFragment = supportFragmentManager.findFragmentById(
                 R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        if (MapViewPlugin.hideToolbar)
+            this.supportActionBar?.hide()
         MapViewPlugin.mapActivity = this
     }
 
@@ -38,7 +42,7 @@ class MapActivity : AppCompatActivity(),
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         map.setMapType(MapViewPlugin.mapViewType)
-
+        map.uiSettings.isCompassEnabled = MapViewPlugin.showCompassButton
         if (MapViewPlugin.showUserLocation) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
@@ -47,11 +51,31 @@ class MapActivity : AppCompatActivity(),
                 ActivityCompat.requestPermissions(this, array, PermissionRequest)
             } else {
                 map.isMyLocationEnabled = true
-                map.uiSettings.isMyLocationButtonEnabled = true
-                map.uiSettings.isIndoorLevelPickerEnabled = true
+                map.uiSettings.isMyLocationButtonEnabled = MapViewPlugin.showMyLocationButton
             }
         }
+        map.setOnMarkerDragListener(object : GoogleMap.OnMarkerDragListener {
+            override fun onMarkerDragEnd(p0: Marker?) {
+                if (p0 != null) {
+                    val id: String = p0.tag as String
+                    MapViewPlugin.annotationDragEnd(id, p0.position)
+                }
+            }
 
+            override fun onMarkerDragStart(p0: Marker?) {
+                if (p0 != null) {
+                    val id: String = p0.tag as String
+                    MapViewPlugin.annotationDragStart(id, p0.position)
+                }
+            }
+
+            override fun onMarkerDrag(p0: Marker?) {
+                if (p0 != null) {
+                    val id: String = p0.tag as String
+                    MapViewPlugin.annotationDrag(id, p0.position)
+                }
+            }
+        })
         map.setOnMapClickListener { latLng ->
             MapViewPlugin.mapTapped(latLng)
         }
@@ -109,9 +133,14 @@ class MapActivity : AppCompatActivity(),
         get() = googleMap?.cameraPosition?.target ?: LatLng(0.0,
                 0.0)
 
-    fun setCamera(target: LatLng, zoom: Float) {
-        googleMap?.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(target, zoom))
+    fun setCamera(target: LatLng, zoom: Float, bearing: Float, tilt: Float) {
+        val cameraPosition = CameraPosition.Builder()
+                .target(target)
+                .zoom(zoom)
+                .bearing(bearing)
+                .tilt(tilt)
+                .build()
+        googleMap?.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
     }
 
     fun setAnnotations(annotations: List<MapAnnotation>) {
@@ -361,26 +390,39 @@ class MapActivity : AppCompatActivity(),
     }
 
     fun createMarkerForAnnotation(annotation: MapAnnotation, map: GoogleMap): Marker {
-        val marker: Marker
+        val markerOptions = MarkerOptions()
+                .position(annotation.coordinate)
+                .title(annotation.title)
+                .draggable(annotation.draggable)
+                .rotation(annotation.rotation.toFloat())
         if (annotation is ClusterAnnotation) {
-            marker = map
-                    .addMarker(MarkerOptions()
-                            .position(annotation.coordinate)
-                            .title(annotation.title)
-                            .icon(
-                                    BitmapDescriptorFactory.defaultMarker(
-                                            annotation.colorHue)))
-            marker.tag = annotation.identifier
-        } else {
-            marker = map
-                    .addMarker(MarkerOptions()
-                            .position(annotation.coordinate)
-                            .title(annotation.title)
-                            .icon(
-                                    BitmapDescriptorFactory.defaultMarker(
-                                            annotation.colorHue)))
-            marker.tag = annotation.identifier
+            markerOptions.snippet(annotation.clusterCount.toString())
         }
+        var bitmap: Bitmap? = null
+        if (annotation.icon != null) {
+            try {
+                val assetFileDescriptor: AssetFileDescriptor = MapViewPlugin.getAssetFileDecriptor(annotation.icon.asset)
+                val fd = assetFileDescriptor.createInputStream()
+                bitmap = BitmapFactory.decodeStream(fd)
+                var width = annotation.icon.width
+                var height = annotation.icon.height
+                if (width == 0.0)
+                    width = bitmap.width.toDouble()
+                if (height == 0.0)
+                    height = bitmap.height.toDouble()
+                bitmap = Bitmap.createScaledBitmap(bitmap, width.toInt(), height.toInt(), false)
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
+        }
+        if (bitmap != null) {
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+        } else {
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(
+                    annotation.colorHue))
+        }
+        val marker = map.addMarker(markerOptions)
+        marker.tag = annotation.identifier
         return marker
     }
 

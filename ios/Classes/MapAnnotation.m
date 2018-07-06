@@ -4,7 +4,7 @@
 
 #import "MapAnnotation.h"
 #import "UIColor+Extensions.h"
-
+#import "MarkerIcon.h"
 
 @implementation MapAnnotation {
 
@@ -14,6 +14,11 @@
     if (self) {
         self.identifier = dictionary[@"id"];
         self.title = dictionary[@"title"];
+        self.draggable= [dictionary[@"draggable"] boolValue];
+        self.rotation= [dictionary[@"rotation"] doubleValue];
+        if([dictionary objectForKey:@"markerIcon"]!=nil){
+            self.icon = [MarkerIcon markerIconFromDictionary:dictionary[@"markerIcon"]];
+        }
         self.coordinate = CLLocationCoordinate2DMake([dictionary[@"latitude"] doubleValue], [dictionary[@"longitude"] doubleValue]);
         self.color = [UIColor colorFromDictionary:dictionary[@"color"]];
     }
