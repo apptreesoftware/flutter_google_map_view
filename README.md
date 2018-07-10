@@ -9,13 +9,13 @@ Please note: API changes are likely as we continue to develop this plugin.
 ### Generate your API Key
  
 1. Go to: https://console.developers.google.com/
-2. Enable `Google Maps Android API`
-3. Enable `Google Maps SDK for iOS`
+2. Enable `Maps SDK for Android`
+3. Enable `Maps SDK for iOS`
 4. Under `Credentials`, choose `Create Credential`. 
    - Note: For development, you can create an unrestricted API key that can be used on both iOS & Android. 
    For production it is highly recommended that you restrict. 
 
-- More detailed instructions for Android can be found here: https://developers.google.com/maps/documentation/android-api/signup
+- More detailed instructions for Android can be found here: https://developers.google.com/maps/documentation/android-sdk/signup
 - More detailed instructions for iOS can be found here: https://developers.google.com/maps/documentation/ios-sdk/get-api-key
  
  The way you register your API key on iOS vs Android is different. Make sure to read the next sections carefully.
@@ -104,12 +104,12 @@ find this file location under `android/app/src/main`
 
 This plugin does not currently support displaying a Google Map within the
 Flutter widget hierarchy. A common workaround for this is to show a static image using the
- [Google Static Maps API](https://developers.google.com/maps/documentation/static-maps/).
+ [Google Static Maps API](https://developers.google.com/maps/documentation/maps-static/intro).
 Included in this Plugin is the StaticMapProvider class which will allow you to easily generate
 a static map. The Static Maps API also requires an API Key and you must enable the API within the Google API Console.
 
 1. Go to: https://console.developers.google.com/
-2. Enable `Google Static Maps API`
+2. Enable `Maps Static API`
 3. Once enabled, you can use the same API key you generated for iOS/Android.
 4. Initialize the StaticMapProvider
     ```dart
