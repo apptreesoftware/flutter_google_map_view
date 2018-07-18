@@ -9,13 +9,13 @@ Please note: API changes are likely as we continue to develop this plugin.
 ### Generate your API Key
  
 1. Go to: https://console.developers.google.com/
-2. Enable `Google Maps Android API`
-3. Enable `Google Maps SDK for iOS`
+2. Enable `Maps SDK for Android`
+3. Enable `Maps SDK for iOS`
 4. Under `Credentials`, choose `Create Credential`. 
    - Note: For development, you can create an unrestricted API key that can be used on both iOS & Android. 
    For production it is highly recommended that you restrict. 
 
-- More detailed instructions for Android can be found here: https://developers.google.com/maps/documentation/android-api/signup
+- More detailed instructions for Android can be found here: https://developers.google.com/maps/documentation/android-sdk/signup
 - More detailed instructions for iOS can be found here: https://developers.google.com/maps/documentation/ios-sdk/get-api-key
  
  The way you register your API key on iOS vs Android is different. Make sure to read the next sections carefully.
@@ -104,12 +104,12 @@ find this file location under `android/app/src/main`
 
 This plugin does not currently support displaying a Google Map within the
 Flutter widget hierarchy. A common workaround for this is to show a static image using the
- [Google Static Maps API](https://developers.google.com/maps/documentation/static-maps/).
+ [Google Static Maps API](https://developers.google.com/maps/documentation/maps-static/intro).
 Included in this Plugin is the StaticMapProvider class which will allow you to easily generate
 a static map. The Static Maps API also requires an API Key and you must enable the API within the Google API Console.
 
 1. Go to: https://console.developers.google.com/
-2. Enable `Google Static Maps API`
+2. Enable `Maps Static API`
 3. Once enabled, you can use the same API key you generated for iOS/Android.
 4. Initialize the StaticMapProvider
     ```dart
@@ -153,10 +153,11 @@ You can refer to the [example](https://github.com/apptreesoftware/flutter_google
 - [X] Customize Pin color
 - [X] Polyline support
 - [X] Polygon support
+- [X] Customize pin image
+- [X] Remove markers, polylines & polygons.
 
 ### Upcoming
-- [ ] Customize pin image
-- [ ] Remove markers
+
 - [ ] Bounds geometry functions
 
 ## Usage examples
@@ -192,6 +193,93 @@ mapView.setMarkers(<Marker>[
 mapView.addMarker(new Marker("3", "10 Barrel", 45.5259467, -122.687747,
         color: Colors.purple));
 ```
+
+#### Edit custom Marker image
+First add your assets to a folder in your project directory. The name of the folder could be any but "images" or "assets" are the more common.
+It should look like this.
+
+```dart
+- project_name
+    |-android
+    |-images
+        |-flower_vase.png
+    |-ios
+    |-lib
+    # Rest of project folders and files
+```
+
+Then add asset to the pubspec.yaml under flutter tag.
+```dart
+flutter:
+    # Code already existent
+
+    # Added asset.
+    assets:
+        - images/flower_vase.png
+```
+
+Finally use the asset name as icon for your marker. If the width or height is not set or is equals to 0, the image original value of said attribute will be used.
+
+```dart
+new Marker(
+      "1",
+      "Something fragile!",
+      45.52480841512737,
+      -122.66201455146073,
+      color: Colors.blue,
+      draggable: true, //Allows the user to move the marker.
+      markerIcon: new MarkerIcon(
+        "images/flower_vase.png", //Asset to be used as icon
+        width: 112.0, //New width for the asset
+        height: 75.0, // New height for the asset
+      ),
+    );
+```
+#### Set a Marker draggable and listening to position changes
+First set the draggable attribute of a marker to true.
+```dart
+Marker marker=new Marker(
+      "1",
+      "Something fragile!",
+      45.52480841512737,
+      -122.66201455146073,
+      draggable: true, //Allows the user to move the marker.
+    );
+```
+Now add listeners for the events.
+```dart
+// This listener fires when the marker is long pressed and could be moved.
+mapView.onAnnotationDragStart.listen((markerMap) {
+      var marker = markerMap.keys.first;
+      var location = markerMap[marker]; // The original location of the marker before moving it. Use it if needed.
+      print("Annotation ${marker.id} dragging started");
+    });
+// This listener fires when the user releases the marker.
+mapView.onAnnotationDragEnd.listen((markerMap) {
+      var marker = markerMap.keys.first;
+      var location = markerMap[marker]; // The actual position of the marker after finishing the dragging.
+      print("Annotation ${marker.id} dragging ended");
+    });
+// This listener fires every time the marker changes position.
+mapView.onAnnotationDrag.listen((markerMap) {
+      var marker = markerMap.keys.first;
+      var location = markerMap[marker]; // The updated position of the marker.
+      print("Annotation ${marker.id} moved to ${location.latitude} , ${location
+          .longitude}");
+    });
+```
+
+#### Add a single polyline to the map
+```dart
+mapView.addPolyline(new Polyline(
+          "12",
+          <Location>[
+            new Location(45.519698, -122.674932),
+            new Location(45.516687, -122.667014),
+          ],
+          width: 15.0));
+```
+
 #### Add multiple polylines to the map
 ```dart
 mapView.setPolylines(<Polyline>[
@@ -217,16 +305,23 @@ mapView.setPolylines(<Polyline>[
       ]);
 ```
 
-#### Add a single polyline to the map
+#### Add a single polygon to the map
 ```dart
-mapView.addPolyline(new Polyline(
-          "12",
-          <Location>[
-            new Location(45.519698, -122.674932),
-            new Location(45.516687, -122.667014),
-          ],
-          width: 15.0));
+mapView.addPolygon(new Polygon(
+                                 "111",
+                                 <Location>[
+                                   new Location(45.5231233, -122.6733130),
+                                   new Location(45.5233225, -122.6732969),
+                                   new Location(45.5232398, -122.6733506),
+                                   new Location(45.5231233, -122.6733130),
+                                 ],
+                                 jointType: FigureJointType.round,
+                                 strokeWidth: 5.0,
+                                 strokeColor: Colors.red,
+                                 fillColor: Color.fromARGB(75, 255, 0, 0),
+                                 ));
 ```
+
 #### Add multiple polygons to the map
 ```dart
  mapView.setPolygons(<Polygon>[
@@ -268,22 +363,12 @@ mapView.addPolyline(new Polyline(
       ]);
 ```
 
-#### Add a single polygon to the map
+#### Remove elements from the map
 ```dart
-mapView.addPolygon(new Polygon(
-                                 "111",
-                                 <Location>[
-                                   new Location(45.5231233, -122.6733130),
-                                   new Location(45.5233225, -122.6732969),
-                                   new Location(45.5232398, -122.6733506),
-                                   new Location(45.5231233, -122.6733130),
-                                 ],
-                                 jointType: FigureJointType.round,
-                                 strokeWidth: 5.0,
-                                 strokeColor: Colors.red,
-                                 fillColor: Color.fromARGB(75, 255, 0, 0),
-                                 ));
+//Remove all markers
+mapView.clearA
 ```
+
 #### Zoom to fit all the pins on the map
 ```dart
 mapView.zoomToFit(padding: 100);

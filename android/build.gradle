@@ -2,7 +2,7 @@ group 'com.apptreesoftware.mapview'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.2.41'
+    ext.kotlin_version = '1.2.50'
     repositories {
         google()
         jcenter()
@@ -45,6 +45,6 @@ android {
 
 dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.41'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.50'
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
 }

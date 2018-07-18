@@ -20,6 +20,8 @@
 @property (nonatomic, retain) NSMutableArray *polylines;
 @property (nonatomic, retain) NSMutableArray *polygons;
 @property (nonatomic) BOOL _locationEnabled;
+@property (nonatomic) BOOL _locationButton;
+@property (nonatomic) BOOL _compassButton;
 @property (nonatomic) BOOL observingLocation;
 @property (nonatomic, assign) MapViewPlugin *plugin;
 @property (nonatomic, retain) NSArray *navigationItems;
@@ -60,36 +62,40 @@
     self.navigationItem.rightBarButtonItems = self.navigationItems;
 }
 
-- (void)setLocationEnabled:(BOOL)enabled {
-    self._locationEnabled = enabled;
+- (void)setMapOptions:(BOOL)myLocationEnabled
+       locationButton:(BOOL)myLocationButton
+        compassButton:(BOOL)compassButton{
+    self._locationEnabled = myLocationEnabled;
+    self._locationButton = myLocationButton;
+    self._compassButton = compassButton;
+}
+
+- (void) loadMapOptions{
     if (self.mapView) {
-        self.mapView.myLocationEnabled = enabled;
-        self.mapView.settings.myLocationButton = enabled;
-        if (enabled) {
+        self.mapView.settings.compassButton = self._compassButton;
+        if (self._locationEnabled) {
+            self.mapView.myLocationEnabled = YES;
+            self.mapView.settings.myLocationButton = self._locationButton;
             [self monitorLocationChanges];
         } else {
             [self stopMonitoringLocationChanges];
         }
     }
 }
-
 - (void)loadView {
     self.mapView = [GMSMapView mapWithFrame:CGRectZero camera:self.initialCameraPosition];
     self.view = self.mapView;
 
     // Creates a marker in the center of the map.
     self.mapView.delegate = self;
-    self.mapView.myLocationEnabled = self._locationEnabled;
-    if (self._locationEnabled) {
-        [self monitorLocationChanges];
-    }
+    [self loadMapOptions];
 
     self.mapView.mapType = self.mapViewType;
     [self.plugin onMapReady];
 }
 
-- (void)setCamera:(CLLocationCoordinate2D)location zoom:(float)zoom {
-    [self.mapView animateToCameraPosition:[GMSCameraPosition cameraWithTarget:location zoom:zoom]];
+- (void)setCamera:(CLLocationCoordinate2D)location zoom:(float)zoom bearing:(CLLocationDirection)bearing tilt:(double)tilt {
+    [self.mapView animateToCameraPosition:[GMSCameraPosition cameraWithTarget:location zoom:zoom bearing:bearing viewingAngle:tilt]];
 }
 
 - (void)updateAnnotations:(NSArray *)annotations {
@@ -187,17 +193,35 @@
     GMSMarker *marker = [GMSMarker new];
     if ([annotation isKindOfClass:[ClusterAnnotation class]]) {
         ClusterAnnotation *clusterAnnotation = (ClusterAnnotation *)annotation;
-        marker.position = annotation.coordinate;
-        marker.title = annotation.title;
         marker.snippet = [NSString stringWithFormat:@"%i", clusterAnnotation.clusterCount];
-        marker.icon = [GMSMarker markerImageWithColor:annotation.color];
-        marker.userData = annotation.identifier;
-    } else {
-        marker.position = annotation.coordinate;
-        marker.title = annotation.title;
-        marker.icon = [GMSMarker markerImageWithColor:annotation.color];
-        marker.userData = annotation.identifier;
     }
+    UIImage* image;
+    if(annotation.icon!=nil){
+        @try {
+            NSString* path=[self.plugin getAssetPath:annotation.icon.asset];
+            NSData* imagedata=[NSData dataWithContentsOfFile:path];
+            image = [UIImage imageWithData:imagedata scale:3.0f];
+            double width=annotation.icon.width;
+            double height=annotation.icon.height;
+            if(width==0)
+                width = image.size.width;
+            if(height==0)
+                height=image.size.height;
+            image = [self resizeImage:image scaledToSize:CGSizeMake(width, height)];
+        }@catch(NSException* e){
+            NSLog(@"Exception: %@",e);
+        }
+    }
+    if(image!=nil){
+        marker.icon = image;
+    }else{
+        marker.icon = [GMSMarker markerImageWithColor:annotation.color];
+    }
+    marker.position = annotation.coordinate;
+    marker.title = annotation.title;
+    marker.rotation = annotation.rotation;
+    marker.userData = annotation.identifier;
+    marker.draggable = annotation.draggable;
     return marker;
 }
 
@@ -334,6 +358,18 @@
     [self.plugin cameraPositionChanged:position];
 }
 
+- (void)mapView:(GMSMapView *)mapView didBeginDraggingMarker:(nonnull GMSMarker *)marker{
+    [self.plugin annotationDragStart:marker.userData position:marker.position];
+}
+
+- (void)mapView:(GMSMapView *)mapView didEndDraggingMarker:(nonnull GMSMarker *)marker{
+    [self.plugin annotationDragEnd:marker.userData position:marker.position];
+}
+
+- (void)mapView:(GMSMapView *)mapView didDragMarker:(nonnull GMSMarker *)marker{
+    [self.plugin annotationDrag:marker.userData position:marker.position];
+}
+
 - (CLLocationCoordinate2D) centerLocation {
     return self.mapView.camera.target;
 }
@@ -385,4 +421,17 @@
     }
     return visiblePolygons;
 }
+
+- (UIImage *)resizeImage:(UIImage*)originalImage scaledToSize:(CGSize)size
+{
+    if (CGSizeEqualToSize(originalImage.size, size)){
+        return originalImage;
+    }
+    UIGraphicsBeginImageContextWithOptions(size, NO, 0.0f);
+    [originalImage drawInRect:CGRectMake(0.0f, 0.0f, size.width, size.height)];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
 @end

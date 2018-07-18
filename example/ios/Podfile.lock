@@ -11,7 +11,7 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `/Users/ceisufro/flutter/bin/cache/artifacts/engine/ios`)
-  - map_view (from `/Users/ceisufro/AndroidStudioProjects/flutter_map_view/ios`)
+  - map_view (from `/Users/ceisufro/AndroidStudioProjects/flutter_google_map_view/ios`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -21,7 +21,7 @@ EXTERNAL SOURCES:
   Flutter:
     :path: "/Users/ceisufro/flutter/bin/cache/artifacts/engine/ios"
   map_view:
-    :path: "/Users/ceisufro/AndroidStudioProjects/flutter_map_view/ios"
+    :path: "/Users/ceisufro/AndroidStudioProjects/flutter_google_map_view/ios"
 
 SPEC CHECKSUMS:
   Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296

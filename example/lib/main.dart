@@ -33,8 +33,18 @@ class _MyAppState extends State<MyApp> {
   //Marker bubble
   List<Marker> _markers = <Marker>[
     new Marker(
-        "1", "Something fragile!", 45.52480841512737, -122.66201455146073,
-        color: Colors.blue),
+      "1",
+      "Something fragile!",
+      45.52480841512737,
+      -122.66201455146073,
+      color: Colors.blue,
+      draggable: true, //Allows the user to move the marker.
+      markerIcon: new MarkerIcon(
+        "images/flower_vase.png",
+        width: 112.0,
+        height: 75.0,
+      ),
+    ),
   ];
 
   //Line
@@ -181,17 +191,21 @@ class _MyAppState extends State<MyApp> {
         new MapOptions(
             mapViewType: MapViewType.normal,
             showUserLocation: true,
+            showMyLocationButton: true,
+            showCompassButton: true,
+            initialCameraPosition: new CameraPosition(new Location(45.526607443935724, -122.66731660813093), 15.0),
+            hideToolbar: false,
             title: "Recently Visited"),
         toolbarActions: [new ToolbarAction("Close", 1)]);
     StreamSubscription sub = mapView.onMapReady.listen((_) {
       mapView.setMarkers(_markers);
       mapView.setPolylines(_lines);
       mapView.setPolygons(_polygons);
-      mapView.zoomToFit(padding: 100);
     });
     compositeSubscription.add(sub);
-    sub = mapView.onLocationUpdated
-        .listen((location) => print("Location updated $location"));
+    sub = mapView.onLocationUpdated.listen((location) {
+      print("Location updated $location");
+    });
     compositeSubscription.add(sub);
     sub = mapView.onTouchAnnotation
         .listen((annotation) => print("annotation ${annotation.id} tapped"));
@@ -207,6 +221,21 @@ class _MyAppState extends State<MyApp> {
     compositeSubscription.add(sub);
     sub = mapView.onCameraChanged.listen((cameraPosition) =>
         this.setState(() => this.cameraPosition = cameraPosition));
+    compositeSubscription.add(sub);
+    sub = mapView.onAnnotationDragStart.listen((markerMap) {
+      var marker = markerMap.keys.first;
+      print("Annotation ${marker.id} dragging started");
+    });
+    sub = mapView.onAnnotationDragEnd.listen((markerMap) {
+      var marker = markerMap.keys.first;
+      print("Annotation ${marker.id} dragging ended");
+    });
+    sub = mapView.onAnnotationDrag.listen((markerMap) {
+      var marker = markerMap.keys.first;
+      var location = markerMap[marker];
+      print("Annotation ${marker.id} moved to ${location.latitude} , ${location
+          .longitude}");
+    });
     compositeSubscription.add(sub);
     sub = mapView.onToolbarAction.listen((id) {
       print("Toolbar button id = $id");

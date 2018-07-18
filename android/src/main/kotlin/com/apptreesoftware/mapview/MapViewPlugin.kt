@@ -2,7 +2,9 @@ package com.apptreesoftware.mapview
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.AssetFileDescriptor
 import android.location.Location
+import android.os.Build
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.CameraPosition
@@ -13,7 +15,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
 /*
-Everytime i reformated the code, this imports were removed so i put them here
+Every time i reformatted the code, this imports were removed so i put them here
 for easier access.
 
 import io.flutter.plugin.common.MethodCall
@@ -35,17 +37,22 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         lateinit var channel: MethodChannel
         var toolbarActions: List<ToolbarAction> = emptyList()
         var showUserLocation: Boolean = false
+        var showMyLocationButton: Boolean = false
+        var showCompassButton: Boolean = false
+        var hideToolbar: Boolean = false
         var mapTitle: String = ""
         lateinit var initialCameraPosition: CameraPosition
         var mapActivity: MapActivity? = null
         val REQUEST_GOOGLE_PLAY_SERVICES = 1000
         var mapViewType: Int = GoogleMap.MAP_TYPE_NORMAL
+        lateinit var registrar: Registrar
 
         @JvmStatic
         fun registerWith(registrar: Registrar): Unit {
             channel = MethodChannel(registrar.messenger(), "com.apptreesoftware.map_view")
             val plugin = MapViewPlugin(activity = registrar.activity())
             channel.setMethodCallHandler(plugin)
+            this.registrar = registrar
         }
 
         fun handleToolbarAction(id: Int) {
@@ -80,6 +87,30 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
             this.channel.invokeMethod("annotationTapped", id)
         }
 
+        fun annotationDragStart(id: String, latLng: LatLng) {
+            this.channel.invokeMethod("annotationDragStart", mapOf(
+                    "id" to id,
+                    "latitude" to latLng.latitude,
+                    "longitude" to latLng.longitude
+            ))
+        }
+
+        fun annotationDragEnd(id: String, latLng: LatLng) {
+            this.channel.invokeMethod("annotationDragEnd", mapOf(
+                    "id" to id,
+                    "latitude" to latLng.latitude,
+                    "longitude" to latLng.longitude
+            ))
+        }
+
+        fun annotationDrag(id: String, latLng: LatLng) {
+            this.channel.invokeMethod("annotationDrag", mapOf(
+                    "id" to id,
+                    "latitude" to latLng.latitude,
+                    "longitude" to latLng.longitude
+            ))
+        }
+
         fun polylineTapped(id: String) {
             this.channel.invokeMethod("polylineTapped", id)
         }
@@ -92,14 +123,25 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
             this.channel.invokeMethod("cameraPositionChanged", mapOf(
                     "latitude" to pos.target.latitude,
                     "longitude" to pos.target.longitude,
-                    "zoom" to pos.zoom
+                    "zoom" to pos.zoom,
+                    "bearing" to pos.bearing,
+                    "tilt" to pos.tilt
             ))
         }
 
         fun locationDidUpdate(loc: Location) {
+            var verticalAccuracy = 0.0f
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                verticalAccuracy = loc.verticalAccuracyMeters
             this.channel.invokeMethod("locationUpdated", mapOf(
                     "latitude" to loc.latitude,
-                    "longitude" to loc.longitude
+                    "longitude" to loc.longitude,
+                    "time" to loc.time,
+                    "altitude" to loc.altitude,
+                    "speed" to loc.speed,
+                    "bearing" to loc.bearing,
+                    "horizontalAccuracy" to loc.accuracy,
+                    "verticalAccuracy" to verticalAccuracy
             ))
         }
 
@@ -109,6 +151,12 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
 
         fun onBackButtonTapped() {
             this.channel.invokeMethod("backButtonTapped", null)
+        }
+
+        fun getAssetFileDecriptor(asset: String): AssetFileDescriptor {
+            val assetManager = registrar.context().getAssets()
+            val key = registrar.lookupKeyForAsset(asset)
+            return assetManager.openFd(key)
         }
     }
 
@@ -125,11 +173,14 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
                 initialCameraPosition = getCameraPosition(cameraDict)
                 toolbarActions = getToolbarActions(call.argument<List<Map<String, Any>>>("actions"))
                 showUserLocation = mapOptions["showUserLocation"] as Boolean
+                showMyLocationButton = mapOptions["showMyLocationButton"] as Boolean
+                showCompassButton = mapOptions["showCompassButton"] as Boolean
+                hideToolbar = mapOptions["hideToolbar"] as Boolean
                 mapTitle = mapOptions["title"] as String
 
                 if (mapOptions["mapViewType"] != null) {
-                    var mappedMapType: Int? = mapTypeMapping.get(mapOptions["mapViewType"]);
-                    if (mappedMapType != null) mapViewType = mappedMapType as Int;
+                    val mappedMapType: Int? = mapTypeMapping.get(mapOptions["mapViewType"]);
+                    if (mappedMapType != null) mapViewType = mappedMapType;
                 }
 
                 val intent = Intent(activity, MapActivity::class.java)
@@ -233,7 +284,9 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
         val lat = map["latitude"] as Double
         val lng = map["longitude"] as Double
         val zoom = map["zoom"] as Double
-        mapActivity?.setCamera(LatLng(lat, lng), zoom.toFloat())
+        val bearing = map["bearing"] as Double
+        val tilt = map["tilt"] as Double
+        mapActivity?.setCamera(LatLng(lat, lng), zoom.toFloat(), bearing.toFloat(), tilt.toFloat())
     }
 
     fun handleZoomToAnnotations(map: Map<String, Any>) {
