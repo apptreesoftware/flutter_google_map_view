@@ -1,4 +1,4 @@
-## [0.0.13] - 4-17-2018
+## [0.0.13] - 7-18-2018
 
 * Added polyline support. Major thanks to @LJaraCastillo
 * Dart2 updates
