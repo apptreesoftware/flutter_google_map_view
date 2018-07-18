@@ -1,3 +1,8 @@
+## [0.0.13] - 4-17-2018
+
+* Added polyline support. Major thanks to @LJaraCastillo
+* Dart2 updates
+
 ## [0.0.12] - 4-17-2018
 
 * Update gradle dependencies
