@@ -1,3 +1,7 @@
+## [0.0.14] - 7-18-2018
+
+* Fixing Android compile issue
+
 ## [0.0.13] - 7-18-2018
 
 * Added polyline support. Major thanks to @LJaraCastillo
