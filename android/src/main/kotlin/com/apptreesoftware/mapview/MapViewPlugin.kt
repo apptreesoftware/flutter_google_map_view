@@ -149,10 +149,6 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
             this.channel.invokeMethod("infoWindowTapped", id)
         }
 
-        fun onBackButtonTapped() {
-            this.channel.invokeMethod("backButtonTapped", null)
-        }
-
         fun getAssetFileDecriptor(asset: String): AssetFileDescriptor {
             val assetManager = registrar.context().getAssets()
             val key = registrar.lookupKeyForAsset(asset)
