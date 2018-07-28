@@ -79,6 +79,9 @@ class MapActivity : AppCompatActivity(),
         map.setOnMapClickListener { latLng ->
             MapViewPlugin.mapTapped(latLng)
         }
+        map.setOnMapLongClickListener({ latLng ->
+            MapViewPlugin.mapLongTapped(latLng)
+        })
         map.setOnMarkerClickListener { marker ->
             MapViewPlugin.annotationTapped(marker.tag as String)
             false

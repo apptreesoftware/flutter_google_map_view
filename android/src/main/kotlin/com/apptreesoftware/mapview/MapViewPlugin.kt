@@ -83,6 +83,12 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
                             "longitude" to latLng.longitude))
         }
 
+        fun mapLongTapped(latLng: LatLng) {
+            this.channel.invokeMethod("mapLongTapped",
+                    mapOf("latitude" to latLng.latitude,
+                            "longitude" to latLng.longitude))
+        }
+
         fun annotationTapped(id: String) {
             this.channel.invokeMethod("annotationTapped", id)
         }
