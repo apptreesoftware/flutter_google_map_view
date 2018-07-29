@@ -8,6 +8,8 @@ import android.os.Build
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.IndoorBuilding
+import com.google.android.gms.maps.model.IndoorLevel
 import com.google.android.gms.maps.model.LatLng
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -153,6 +155,38 @@ class MapViewPlugin(val activity: Activity) : MethodCallHandler {
             val assetManager = registrar.context().getAssets()
             val key = registrar.lookupKeyForAsset(asset)
             return assetManager.openFd(key)
+        }
+
+        fun indoorBuildingActivated(indoorBuilding: IndoorBuilding?) {
+            if (indoorBuilding == null) {
+                this.channel.invokeMethod("indoorBuildingActivated", null)
+            } else {
+                this.channel.invokeMethod("indoorBuildingActivated", mapOf(
+                        "underground" to indoorBuilding.isUnderground,
+                        "defaultIndex" to indoorBuilding.defaultLevelIndex,
+                        "levels" to mappingIndoorLevels(indoorBuilding.levels)))
+            }
+        }
+
+        fun indoorLevelActivated(level: IndoorLevel?) {
+            if (level == null) {
+                this.channel.invokeMethod("indoorLevelActivated", null)
+            } else {
+                this.channel.invokeMethod("indoorLevelActivated", mappingIndoorLevel(level))
+            }
+        }
+
+        private fun mappingIndoorLevels(levels: List<IndoorLevel>): List<Map<String, Any>> {
+            val list = mutableListOf<Map<String, Any>>()
+            levels.forEach { level -> list.add(mappingIndoorLevel(level)) }
+            return list
+        }
+
+        private fun mappingIndoorLevel(level: IndoorLevel): Map<String, Any> {
+            return mapOf(
+                    "name" to level.name,
+                    "shortName" to level.shortName
+            )
         }
     }
 

@@ -88,6 +88,7 @@
 
     // Creates a marker in the center of the map.
     self.mapView.delegate = self;
+    self.mapView.indoorDisplay.delegate = self;
     [self loadMapOptions];
 
     self.mapView.mapType = self.mapViewType;
@@ -368,6 +369,14 @@
 
 - (void)mapView:(GMSMapView *)mapView didDragMarker:(nonnull GMSMarker *)marker{
     [self.plugin annotationDrag:marker.userData position:marker.position];
+}
+
+- (void)didChangeActiveBuilding:(GMSIndoorBuilding *)building{
+    [self.plugin indoorBuildingActivated:building];
+}
+
+- (void)didChangeActiveLevel:(GMSIndoorLevel *)level{
+    [self.plugin indoorLevelActivated:level];
 }
 
 - (CLLocationCoordinate2D) centerLocation {

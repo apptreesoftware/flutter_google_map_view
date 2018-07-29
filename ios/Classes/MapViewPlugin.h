@@ -3,6 +3,8 @@
 @class MapViewController;
 
 @class GMSCameraPosition;
+@class GMSIndoorBuilding;
+@class GMSIndoorLevel;
 
 @interface MapViewPlugin : NSObject<FlutterPlugin>
 
@@ -24,6 +26,10 @@
 - (void)infoWindowTapped:(NSString *)identifier; 
 - (void)mapTapped:(CLLocationCoordinate2D)coordinate;
 - (void)cameraPositionChanged:(GMSCameraPosition *)position;
+- (void)indoorBuildingActivated:(GMSIndoorBuilding *)indoorBuilding;
+- (void)indoorLevelActivated:(GMSIndoorLevel *)indoorLevel;
+- (NSArray<NSDictionary *> *)mappingIndoorLevels:(NSArray<GMSIndoorLevel *> *)levels;
+- (NSDictionary *)mappingIndoorLevel:(GMSIndoorLevel *)level;
 - (int)getMapViewType:(NSString *)mapViewTypeName;
 - (NSString *)getAssetPath:(NSString *)iconPath;
 @end
