@@ -284,6 +284,40 @@
     return camera;
 }
 
+- (void)indoorBuildingActivated:(GMSIndoorBuilding *)indoorBuilding {
+    NSDictionary *arg = nil;
+    if (indoorBuilding != nil) {
+        arg = @{@"underground": @(indoorBuilding.underground),
+                @"defaultLevelIndex": @(indoorBuilding.defaultLevelIndex),
+                @"levels": [self mappingIndoorLevels:indoorBuilding.levels]};
+    }
+    [self.channel invokeMethod:@"indoorBuildingActivated" arguments:arg];
+}
+
+- (void)indoorLevelActivated:(GMSIndoorLevel *)indoorLevel {
+    NSDictionary *arg = nil;
+    if (indoorLevel != nil) {
+        arg =  [self mappingIndoorLevel:indoorLevel];
+    }
+    [self.channel invokeMethod:@"indoorLevelActivated" arguments:arg];
+}
+
+- (NSArray<NSDictionary *> *)mappingIndoorLevels:(NSArray<GMSIndoorLevel *> *)levels {
+    if (levels == nil) {
+        return nil;
+    }
+    NSMutableArray* array = [NSMutableArray array];
+    for (GMSIndoorLevel *level in levels) {
+        [array addObject: [self mappingIndoorLevel:level]];
+    }
+    return array;
+}
+
+- (NSDictionary *)mappingIndoorLevel:(GMSIndoorLevel *)level {
+    return @{@"name": [NSString stringWithString:level.name],
+             @"shortName": [NSString stringWithString:level.shortName]};
+}
+
 - (int)getMapViewType:(NSString *)mapViewTypeName {
     int mapType = kGMSTypeNormal;
     if ([@"none" isEqualToString:mapViewTypeName]) {

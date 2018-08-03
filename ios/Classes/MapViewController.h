@@ -8,13 +8,14 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 #import <GoogleMaps/GoogleMaps/GMSMapView.h>
+#import <GoogleMaps/GoogleMaps/GMSIndoorDisplay.h>
 
 @class MapViewPlugin;
 @class MapAnnotation;
 @class MapPolyline;
 @class MapPolygon;
 
-@interface MapViewController : UIViewController <GMSMapViewDelegate>
+@interface MapViewController : UIViewController <GMSMapViewDelegate, GMSIndoorDisplayDelegate>
 
 - (id)initWithPlugin:(MapViewPlugin *)plugin
      navigationItems:(NSArray *)items

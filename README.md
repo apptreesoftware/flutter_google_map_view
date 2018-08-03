@@ -396,6 +396,14 @@ mapView.onMapTapped
      .listen((location) => print("Touched location $location"));
 ```
 
+#### Receive indoor building & indoor level
+```dart
+mapView.onIndoorBuildingActivated.listen(
+        (indoorBuilding) => print("Activated indoor building $indoorBuilding"));
+mapView.onIndoorLevelActivated.listen(
+    (indoorLevel) => print("Activated indoor level $indoorLevel"));
+```
+
 #### Receive camera change updates
 ```dart
 mapView.onCameraChanged.listen((cameraPosition) =>

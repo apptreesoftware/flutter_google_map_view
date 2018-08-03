@@ -249,6 +249,12 @@ class _MyAppState extends State<MyApp> {
       print("Info Window Tapped for ${marker.title}");
     });
     compositeSubscription.add(sub);
+    sub = mapView.onIndoorBuildingActivated.listen(
+        (indoorBuilding) => print("Activated indoor building $indoorBuilding"));
+    compositeSubscription.add(sub);
+    sub = mapView.onIndoorLevelActivated.listen(
+        (indoorLevel) => print("Activated indoor level $indoorLevel"));
+    compositeSubscription.add(sub);
   }
 
   _handleDismiss() async {

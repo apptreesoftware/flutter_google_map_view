@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:map_view/camera_position.dart';
+import 'package:map_view/indoor_building.dart';
 import 'package:map_view/location.dart';
 import 'package:map_view/map_options.dart';
 import 'package:map_view/marker.dart';
@@ -44,6 +45,10 @@ class MapView {
   StreamController<Null> _mapReadyStreamController =
       new StreamController.broadcast();
   StreamController<Marker> _infoWindowStreamController =
+      new StreamController.broadcast();
+  StreamController<IndoorBuilding> _indoorBuildingActivatedStreamController =
+      new StreamController.broadcast();
+  StreamController<IndoorLevel> _indoorLevelActivatedStreamController =
       new StreamController.broadcast();
 
   Map<String, Marker> _annotations = {};
@@ -262,6 +267,12 @@ class MapView {
 
   Stream<Marker> get onInfoWindowTapped => _infoWindowStreamController.stream;
 
+  Stream<IndoorBuilding> get onIndoorBuildingActivated =>
+      _indoorBuildingActivatedStreamController.stream;
+
+  Stream<IndoorLevel> get onIndoorLevelActivated =>
+      _indoorLevelActivatedStreamController.stream;
+
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onMapReady":
@@ -342,6 +353,28 @@ class MapView {
         return new Future.value("");
       case "onToolbarAction":
         _toolbarActionStreamController.add(call.arguments);
+        break;
+      case "indoorBuildingActivated":
+        if (call.arguments == null) {
+          _indoorBuildingActivatedStreamController.add(null);
+        } else {
+          List<IndoorLevel> levels = [];
+          for (var value in call.arguments["levels"]) {
+            levels.add(IndoorLevel(value["name"], value["shortName"]));
+          }
+          _indoorBuildingActivatedStreamController.add(new IndoorBuilding(
+              call.arguments["underground"],
+              call.arguments["defaultLevelIndex"],
+              levels));
+        }
+        break;
+      case "indoorLevelActivated":
+        if (call.arguments == null) {
+          _indoorLevelActivatedStreamController.add(null);
+        } else {
+          _indoorLevelActivatedStreamController.add(
+              IndoorLevel(call.arguments["name"], call.arguments["shortName"]));
+        }
         break;
     }
     return new Future.value("");
