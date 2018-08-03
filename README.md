@@ -394,6 +394,8 @@ mapView.onTouchPolygon.listen((polygon) => print("polygon ${polygon.id} tapped")
 ```dart
 mapView.onMapTapped
      .listen((location) => print("Touched location $location"));
+mapView.onMapLongTapped
+     .listen((location) => print("Long tapped location $location"));
 ```
 
 #### Receive indoor building & indoor level

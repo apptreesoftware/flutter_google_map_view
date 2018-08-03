@@ -36,7 +36,9 @@ class MapView {
       new StreamController.broadcast();
   StreamController<Location> _locationChangeStreamController =
       new StreamController.broadcast();
-  StreamController<Location> _mapInteractionStreamController =
+  StreamController<Location> _mapTapInteractionStreamController =
+      new StreamController.broadcast();
+  StreamController<Location> _mapLongTapInteractionStreamController =
       new StreamController.broadcast();
   StreamController<CameraPosition> _cameraStreamController =
       new StreamController.broadcast();
@@ -257,7 +259,9 @@ class MapView {
   Stream<Location> get onLocationUpdated =>
       _locationChangeStreamController.stream;
 
-  Stream<Location> get onMapTapped => _mapInteractionStreamController.stream;
+  Stream<Location> get onMapTapped => _mapTapInteractionStreamController.stream;
+
+  Stream<Location> get onMapLongTapped => _mapLongTapInteractionStreamController.stream;
 
   Stream<CameraPosition> get onCameraChanged => _cameraStreamController.stream;
 
@@ -346,7 +350,12 @@ class MapView {
       case "mapTapped":
         Map locationMap = call.arguments;
         Location location = new Location.fromMap(locationMap);
-        _mapInteractionStreamController.add(location);
+        _mapTapInteractionStreamController.add(location);
+        return new Future.value("");
+      case "mapLongTapped":
+        Map locationMap = call.arguments;
+        Location location = new Location.fromMap(locationMap);
+        _mapLongTapInteractionStreamController.add(location);
         return new Future.value("");
       case "cameraPositionChanged":
         _cameraStreamController.add(new CameraPosition.fromMap(call.arguments));

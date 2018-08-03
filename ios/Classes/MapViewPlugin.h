@@ -25,6 +25,7 @@
 - (void)polygonTapped:(NSString *)identifier;
 - (void)infoWindowTapped:(NSString *)identifier; 
 - (void)mapTapped:(CLLocationCoordinate2D)coordinate;
+- (void)mapLongTapped:(CLLocationCoordinate2D)coordinate;
 - (void)cameraPositionChanged:(GMSCameraPosition *)position;
 - (void)indoorBuildingActivated:(GMSIndoorBuilding *)indoorBuilding;
 - (void)indoorLevelActivated:(GMSIndoorLevel *)indoorLevel;

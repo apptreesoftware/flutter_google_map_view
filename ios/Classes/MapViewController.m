@@ -355,6 +355,10 @@
     [self.plugin mapTapped:coordinate];
 }
 
+- (void)mapView:(GMSMapView *)mapView didLongPressAtCoordinate:(CLLocationCoordinate2D)coordinate {
+    [self.plugin mapLongTapped:coordinate];
+}
+
 - (void)mapView:(GMSMapView *)mapView didChangeCameraPosition:(GMSCameraPosition *)position {
     [self.plugin cameraPositionChanged:position];
 }

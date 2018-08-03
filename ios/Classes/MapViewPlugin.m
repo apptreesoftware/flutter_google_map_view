@@ -266,6 +266,10 @@
     [self.channel invokeMethod:@"mapTapped" arguments:@{@"latitude": @(coordinate.latitude), @"longitude": @(coordinate.longitude)}];
 }
 
+- (void)mapLongTapped:(CLLocationCoordinate2D)coordinate {
+    [self.channel invokeMethod:@"mapLongTapped" arguments:@{@"latitude": @(coordinate.latitude), @"longitude": @(coordinate.longitude)}];
+}
+
 - (void)cameraPositionChanged:(GMSCameraPosition *)position {
     [self.channel invokeMethod:@"cameraPositionChanged" arguments:@{
             @"latitude": @(position.target.latitude),
