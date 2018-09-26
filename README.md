@@ -1,3 +1,15 @@
+# IMPORTANT: This plugin is no longer under development
+### Why?
+
+We initially built this plugin to fill an early gap in flutter. Since then, Google has made progress on their [Google Map plugin](https://github.com/flutter/plugins/tree/master/packages/google_maps_flutter).
+
+Meanwhile, at AppTree, we've moved on to building a pure Dart implementation for mapping based off of [leaflet](https://leafletjs.com/), which you can find [here](https://pub.dartlang.org/packages/flutter_map). This plugin has the following important features:
+
+- Allows inline maps within your Widget hierarchy (rather than full screen)
+- Pins are just widgets. Very easy to customize
+- 0 dependencies on native libraries. No more Google Play or Cocoapod dependencies!
+- You can use any OpenStreetMap tiles as well as paid tile providers like MapBox and ESRI. Unfortunately, Google Map tiles are not available. You can find more about available tile providers [here](https://github.com/Leaflet/Leaflet/blob/master/FAQ.md#what-map-tiles-can-i-use-with-leaflet-is-it-limited-to-openstreetmap).
+
 # map_view
 
 A flutter plugin for displaying google maps on iOS and Android
